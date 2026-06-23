@@ -3,7 +3,9 @@ const mongoose = require("mongoose")
 const doctorProfileSchema = mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user"
+        ref: "user",
+        required: true,
+        unique: true
     },
     specialization: {
         type: String
@@ -29,17 +31,31 @@ const doctorProfileSchema = mongoose.Schema({
         type: Number,
         required: true,
     },
-    availability: {
-        type:Arr,
-        required:true
+    availability: [
+        {
+            day: {
+                type: String,
+                required: true
+            },
+
+            startTime: {
+                type: Number,
+                required: true
+            },
+
+            endTime: {
+                type: Number,
+                required: true
+            }
+        }
+    ],
+    rating: {
+        type: Number,
+        default: 0
     },
-    rating:{
-        type:Number,
-        default:0
-    },
-    totalReviews:{
-        type:Number,
-        default:0
+    totalReviews: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true })
 
