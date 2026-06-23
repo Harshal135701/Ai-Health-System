@@ -1,13 +1,17 @@
 const express = require("express")
 const app = express()
 require("dotenv").config()
-const connectDb=require('./src/config/db')
+const connectDb = require('./src/config/db')
 connectDb()
+const cookieParser = require('cookie-parser');
 port = process.env.PORT || 5000;
-
-app.get("/",(req,res)=>{
-    res.send("The new project is started")
+const authRoutes = require("./src/routes/authRoute")
+app.get("/", (req, res) => {
+    res.send("Server Running");
 })
+app.use(cookieParser());
+app.use(express.json());
+app.use("/", authRoutes);
 
 app.listen(port, () => {
     console.log(`Listening on port no ${port}`);
