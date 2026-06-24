@@ -1,37 +1,31 @@
-const doctorProfileModel = require("../models/doctorProfile")
 const userModel = require("../models/user")
+const patientProfile = require("../models/patientProfile")
 
 async function completeProfile(req, res) {
     try {
-        const { specialization, experience, hospital, education, licenseNumber, consultationFee, availability } = req.body;
-
-        const profileAlreadyExist = await doctorProfileModel.findOne({ userId: req.user._id });
-        if (profileAlreadyExist) {
-            return res.status(409).json({
-                status: false,
-                message: "Profile already exist"
-            })
-        }
-
-        if (!specialization || !hospital || !education || !licenseNumber || !consultationFee || !availability) {
+        const { age, gender, bloodGroup, allergies, medicalHistory, address } = req.body;
+        if (age === null || age === undefined) {
             return res.status(400).json({
                 status: false,
                 message: "Fields not exist"
             })
         }
 
-        if (experience === undefined || experience === null) {
+        if (!gender || !bloodGroup || !allergies || !medicalHistory || !address) {
             return res.status(400).json({
                 status: false,
                 message: "Fields not exist"
             })
         }
 
-        await doctorProfileModel.create({
+        await patientProfile.create({
             userId: req.user._id,
-            specialization,
-            experience,
-            hospital, education, licenseNumber, consultationFee, availability
+            age,
+            gender,
+            bloodGroup,
+            allergies,
+            medicalHistory,
+            address
         })
 
 
@@ -43,9 +37,8 @@ async function completeProfile(req, res) {
 
         return res.status(201).json({
             status: true,
-            message: "Profile it completed"
+            message: "The profile is completed"
         })
-
     }
     catch (err) {
         return res.status(500).json({
@@ -55,29 +48,30 @@ async function completeProfile(req, res) {
     }
 }
 
+
 async function updateProfile(req, res) {
     try {
-        const { specialization, experience, hospital, education, consultationFee, availability } = req.body
+        const { age, gender, bloodGroup, allergies, medicalHistory, address } = req.body
 
         const updateData = {}
 
-        if (specialization) {
-            updateData.specialization = specialization
+        if (gender) {
+            updateData.gender = gender
         }
-        if (experience !== undefined && experience !== null) {
-            updateData.experience = experience
+        if (age !== undefined && age !== null) {
+            updateData.age = age
         }
-        if (hospital) {
-            updateData.hospital = hospital
+        if (bloodGroup) {
+            updateData.bloodGroup = bloodGroup
         }
-        if (education) {
-            updateData.education = education
+        if (allergies) {
+            updateData.allergies = allergies
         }
-        if (consultationFee !== undefined && consultationFee !== null) {
-            updateData.consultationFee = consultationFee
+        if (medicalHistory) {
+            updateData.medicalHistory = medicalHistory
         }
-        if (availability) {
-            updateData.availability = availability
+        if (address) {
+            updateData.address = address
         }
 
         if (Object.keys(updateData).length === 0) {
@@ -87,7 +81,7 @@ async function updateProfile(req, res) {
             })
         }
 
-        const updatedProfile = await doctorProfileModel.findOneAndUpdate(
+        const updatedProfile = await patientProfile.findOneAndUpdate(
             { userId: req.user._id },
             updateData,
             { new: true }
@@ -106,6 +100,7 @@ async function updateProfile(req, res) {
         })
     }
 }
+
 
 module.exports = {
     completeProfile, updateProfile
