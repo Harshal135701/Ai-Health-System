@@ -107,6 +107,30 @@ async function updateProfile(req, res) {
     }
 }
 
+async function dashboardPage(req, res) {
+    try {
+
+        const doctor = req.user;
+        if (!doctor) {
+            return res.status(404).json({
+                status: false,
+                message: "Doctor not found"
+            })
+        }
+        return res.status(200).render("doctor/dashboard", {
+            doctor,
+            status: true,
+            message: "user is logged in"
+        })
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        })
+    }
+}
+
 module.exports = {
-    completeProfile, updateProfile
+    completeProfile, updateProfile, dashboardPage
 }

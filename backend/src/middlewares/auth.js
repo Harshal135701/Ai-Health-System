@@ -6,10 +6,7 @@ async function authMiddleware(req, res, next) {
         const token = req.cookies.token;
 
         if (!token) {
-            return res.status(401).json({
-                status: false,
-                message: "Token not found"
-            })
+            return res.redirect("/login")
         }
 
         const decode = jwt.verify(token, process.env.JWT_SECRET)
@@ -26,10 +23,7 @@ async function authMiddleware(req, res, next) {
         next()
     }
     catch (err) {
-        return res.status(505).json({
-            status: false,
-            message: err
-        })
+        return res.redirect("/login")
     }
 }
 

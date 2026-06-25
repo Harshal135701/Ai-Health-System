@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment</title>
+</head>
+
+<body>
+
+    <h2>Book Appointment</h2>
+
+    <h3>Doctor Details</h3>
+
+    <p>Name: <%= doctor.userId.name %></p>
+    <p>Specialization: <%= doctor.specialization %></p>
+    <p>Consultation Fee: ₹<%= doctor.consultationFee %></p>
+
+    <form action="/appointments/book/<%= doctor.userId._id %>" method="POST">
+
+        <label>Appointment Date</label>
+        <input type="date" name="appointmentDate" required>
+        <br><br>
+
+        <label>Start Time</label>
+        <input type="time" name="startTime" required>
+        <br><br>
+
+        <label>End Time</label>
+        <input type="time" name="endTime" required>
+        <br><br>
+
+        <label>Symptoms</label>
+        <br>
+        <textarea
+            name="symptoms"
+            rows="4"
+            cols="40"
+            placeholder="Enter symptoms"></textarea>
+        <br><br>
+
+        <label>Patient Message</label>
+        <br>
+        <textarea
+            name="patientMessage"
+            rows="4"
+            cols="40"
+            placeholder="Additional information"></textarea>
+        <br><br>
+
+        <button type="submit">
+            Book Appointment
+        </button>
+
+    </form>
+
+</body>
+
+</html>

@@ -16,11 +16,11 @@ const appointmentSchema = mongoose.Schema({
         required: true
     },
     startTime: {
-        type: Number,
+        type: Date,
         required: true
     },
     endTime: {
-        type: Number,
+        type: Date,
         required: true
     },
     symptoms: {

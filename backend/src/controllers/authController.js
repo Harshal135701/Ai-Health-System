@@ -85,13 +85,13 @@ async function login(req, res) {
 
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true
+            // secure: true
         })
-
-        return res.status(200).json({
-            status: true,
-            message: "user is logged in"
-        })
+        if (userExist.role === 'doctor') {
+            return res.redirect('/doctor/dashboard');
+        }
+        return res.redirect("/patient/dashboard");
+        
     }
     catch (err) {
         return res.status(500).json({
@@ -120,5 +120,5 @@ async function registrationPage(req, res) {
 }
 
 module.exports = {
-    registration, login, loginPage,registrationPage
+    registration, login, loginPage, registrationPage
 }

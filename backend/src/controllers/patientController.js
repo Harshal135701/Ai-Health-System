@@ -1,5 +1,6 @@
 const userModel = require("../models/user")
 const patientProfile = require("../models/patientProfile")
+const doctorProfile = require("../models/doctorProfile")
 
 async function completeProfile(req, res) {
     try {
@@ -102,6 +103,97 @@ async function updateProfile(req, res) {
 }
 
 
+async function dashboardPage(req, res) {
+    try {
+
+        const patient = req.user;
+        if (!patient) {
+            return res.status(404).json({
+                status: false,
+                message: "patient not found"
+            })
+        }
+        return res.status(200).render("patient/dashboard", {
+            patient,
+            status: true,
+            message: "user is logged in"
+        })
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        })
+    }
+}
+
+async function Alldoctors(req, res) {
+    try {
+
+        const doctors = await userModel.find({
+            $and: [
+                { role: "doctor" },
+                { isProfileCompleted: true }
+            ]
+        })
+
+        if (doctors.length === 0) {
+            return res.status(404).json({
+                message: "Doctors not found"
+            })
+        }
+        return res.status(200).render("patient/Alldoctors", {
+            doctors
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        })
+    }
+}
+
+async function completeDoctorInfo(req, res) {
+    try {
+        const id = req.params.DoctorId;
+        const doctor = await doctorProfile.findOne({
+            userId: id
+        }).populate("userId")
+
+        if (!doctor) {
+            return res.status(404).redirect("/patient/Alldoctors");
+        }
+        return res.status(200).render("patient/doctorProfile", {
+            doctor
+        })
+    }
+    catch (err) {
+        return res.status(404).redirect("/patient/Alldoctors");
+    }
+}
+
+async function bookAppointment(req, res) {
+    try {
+        const id = req.params.DoctorId;
+        const doctor = await doctorProfile.findOne({
+            userId: id
+        }).populate("userId")
+
+        if (!doctor) {
+            return res.status(404).redirect("/patient/Alldoctors");
+        }
+
+        return res.status(200).render("patient/bookAppointment",{
+            doctor
+        })
+    }
+    catch (err) {
+        return res.redirect("/patient/Alldoctors")
+    }
+}
+
+
 module.exports = {
-    completeProfile, updateProfile
+    completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
 }
