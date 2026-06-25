@@ -83,8 +83,8 @@ async function login(req, res) {
             expiresIn: "1d",
         });
 
-        res.cookie('token', token,{
-            httpOnly: true,                        
+        res.cookie('token', token, {
+            httpOnly: true,
             secure: true
         })
 
@@ -101,6 +101,24 @@ async function login(req, res) {
     }
 }
 
+async function loginPage(req, res) {
+    try {
+        return res.render("auth/login")
+    }
+    catch (err) {
+        return res.status(500).send("Something went wrong")
+    }
+}
+
+async function registrationPage(req, res) {
+    try {
+        return res.render("auth/registration")
+    }
+    catch (err) {
+        return res.status(500).send("Something went wrong")
+    }
+}
+
 module.exports = {
-    registration, login
+    registration, login, loginPage,registrationPage
 }
