@@ -16,11 +16,11 @@ const appointmentSchema = mongoose.Schema({
         required: true
     },
     startTime: {
-        type: Date,
+        type: Number,
         required: true
     },
     endTime: {
-        type: Date,
+        type: Number,
         required: true
     },
     symptoms: {
@@ -32,7 +32,7 @@ const appointmentSchema = mongoose.Schema({
     appointmentStatus:{
         type:String,
         required:true,
-        enum:["cancelled","pending","confirmed","completed"],
+        enum:["cancelled","pending","confirmed","completed","rejected"],
         default:"pending"
     },
     consultationFee: {

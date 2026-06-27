@@ -13,11 +13,14 @@
 
     <h3>Doctor Details</h3>
 
-    <p>Name: <%= doctor.userId.name %></p>
-    <p>Specialization: <%= doctor.specialization %></p>
-    <p>Consultation Fee: ₹<%= doctor.consultationFee %></p>
+    <p>Name: <%= doctor.userId.name %>
+    </p>
+    <p>Specialization: <%= doctor.specialization %>
+    </p>
+    <p>Consultation Fee: ₹<%= doctor.consultationFee %>
+    </p>
 
-    <form action="/appointments/book/<%= doctor.userId._id %>" method="POST">
+    <form id="AppointmentBooking" data-doctor-id="<%= doctor._id %>">
 
         <label>Appointment Date</label>
         <input type="date" name="appointmentDate" required>
@@ -33,28 +36,20 @@
 
         <label>Symptoms</label>
         <br>
-        <textarea
-            name="symptoms"
-            rows="4"
-            cols="40"
-            placeholder="Enter symptoms"></textarea>
+        <textarea name="symptoms" rows="4" cols="40" placeholder="Enter symptoms" required></textarea>
         <br><br>
 
         <label>Patient Message</label>
         <br>
-        <textarea
-            name="patientMessage"
-            rows="4"
-            cols="40"
-            placeholder="Additional information"></textarea>
+        <textarea name="patientMessage" rows="4" cols="40" placeholder="Additional information" required></textarea>
         <br><br>
 
         <button type="submit">
             Book Appointment
         </button>
-
     </form>
 
+    <script src="/js/bookAppointment.js"></script>
 </body>
 
 </html>
