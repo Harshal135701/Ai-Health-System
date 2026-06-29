@@ -220,6 +220,8 @@ async function handleBookAppointment(req, res) {
             });
         }
 
+        const patientId = req.user._id;
+
         // Find Doctor
 
         const doctorId = req.params.DoctorId;
@@ -256,9 +258,9 @@ async function handleBookAppointment(req, res) {
         // Validate Appointment Date
 
         const requestedDate = new Date(appointmentDate);
+        requestedDate.setHours(0, 0, 0, 0);
 
         const today = new Date();
-
         today.setHours(0, 0, 0, 0);
 
         if (requestedDate < today) {
@@ -268,7 +270,7 @@ async function handleBookAppointment(req, res) {
             });
         }
 
-        // Find Requested Day 
+        // Find Requested Day
 
         const requestedDay =
             requestedDate.toLocaleDateString("en-US", {
@@ -276,7 +278,7 @@ async function handleBookAppointment(req, res) {
             });
 
         // Doctor Available?
-    
+
         const availableSlot =
             doctor.availability.find(
                 slot => slot.day === requestedDay
@@ -301,12 +303,23 @@ async function handleBookAppointment(req, res) {
             });
         }
 
-        // Check Slot Conflict
+        // Get Start & End Of Day
+
+        const startOfDay = new Date(requestedDate);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(requestedDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        // Check Doctor Slot Conflict
 
         const existingAppointments =
             await appointmentModel.find({
                 doctorId,
-                appointmentDate: requestedDate,
+                appointmentDate: {
+                    $gte: startOfDay,
+                    $lte: endOfDay
+                },
                 appointmentStatus: {
                     $in: ["pending", "confirmed"]
                 }
@@ -325,7 +338,32 @@ async function handleBookAppointment(req, res) {
             }
         }
 
-        const patientId = req.user._id;
+        // Check Patient Slot Conflict
+
+        const patientAppointments =
+            await appointmentModel.find({
+                patientId,
+                appointmentDate: {
+                    $gte: startOfDay,
+                    $lte: endOfDay
+                },
+                appointmentStatus: {
+                    $in: ["pending", "confirmed"]
+                }
+            });
+
+        for (const appointment of patientAppointments) {
+
+            if (
+                appointmentStartTime < appointment.endTime &&
+                appointmentEndTime > appointment.startTime
+            ) {
+                return res.status(409).json({
+                    status: false,
+                    message: "You already have another appointment during this time."
+                });
+            }
+        }
 
         const bookedAppointment =
             await appointmentModel.create({
@@ -368,8 +406,44 @@ async function handleBookAppointment(req, res) {
     }
 }
 
+async function allappointments(req, res) {
+    try {
+
+        const user = req.user;
+
+        const allappointments = await appointmentModel
+            .find({
+                patientId: user._id
+            })
+            .populate({
+                // We are using nested populate 
+                // because in doctorId only access doctor profile 
+                // but to access user model we need this
+                path: "doctorId",
+                populate: {
+                    path: "userId"
+                }
+            })
+            .sort({ appointmentDate: -1 });
+
+        return res.status(200).render("patient/appointments", {
+            status: true,
+            appointments: allappointments,
+            user
+        });
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+
+    }
+}
 
 module.exports = {
     completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
-    , handleBookAppointment
+    , handleBookAppointment, allappointments
 }

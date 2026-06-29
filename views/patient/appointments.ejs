@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments</title>
+</head>
+
+<body>
+
+    <h2>All Appointments of <%= user.name %>
+    </h2>
+
+    <% if(appointments.length===0){ %>
+
+        <h3>No appointments found.</h3>
+
+        <% } else { %>
+
+            <% appointments.forEach(function(appointment){ %>
+                
+                <hr>
+
+                <h3>
+                    Doctor :
+                    <%= appointment.doctorId.userId.name %>
+                </h3>
+
+                <p>
+                    <strong>Date :</strong>
+
+                    <%= appointment.appointmentDate.toLocaleDateString("en-IN",{ day:"numeric", month:"long",
+                        year:"numeric" }) %>
+                </p>
+
+                <% const startHour=Math.floor(appointment.startTime / 60); const startMinute=appointment.startTime % 60;
+                    const endHour=Math.floor(appointment.endTime / 60); const endMinute=appointment.endTime % 60; %>
+
+                    <p>
+                        <strong>Time :</strong>
+
+                        <%= String(startHour).padStart(2,"0") %>:<%= String(startMinute).padStart(2,"0") %>
+                                <!-- padStart is used to add some words at beginning -->
+                                <!-- syntax like (targetLength,string) -->
+                                <!-- eg padStart(2,"0")-> and start HOur got 9 so lengtgh is 1 so add 09 -->
+
+                                -
+
+                                <%= String(endHour).padStart(2,"0") %>:<%= String(endMinute).padStart(2,"0") %>
+                    </p>
+
+                    <p>
+                        <strong>Status :</strong>
+                        <%= appointment.appointmentStatus %>
+                    </p>
+
+                    <p>
+                        <strong>Symptoms :</strong>
+                        <%= appointment.symptoms %>
+                    </p>
+
+                    <p>
+                        <strong>Consultation Fee :</strong>
+                        ₹<%= appointment.consultationFee %>
+                    </p>
+
+                    <% }) %>
+
+                        <% } %>
+
+</body>
+
+</html>
