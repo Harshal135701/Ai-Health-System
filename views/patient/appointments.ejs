@@ -19,7 +19,7 @@
         <% } else { %>
 
             <% appointments.forEach(function(appointment){ %>
-                
+
                 <hr>
 
                 <h3>
@@ -65,10 +65,15 @@
                         ₹<%= appointment.consultationFee %>
                     </p>
 
+                    <button class="cancelBtn" data-appointment-id="<%= appointment._id %>">
+                        Cancel Appointment
+                    </button>
+                    
                     <% }) %>
 
-                        <% } %>
 
+                        <% } %>
+                            <script src="/js/cancelAppointment.js"></script>
 </body>
 
 </html>

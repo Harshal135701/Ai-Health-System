@@ -443,7 +443,54 @@ async function allappointments(req, res) {
     }
 }
 
+async function cancelAppointment(req, res) {
+    try {
+        const appointmentId = req.params.appointmentId;
+        if (!appointmentId) {
+            return res.status(404).json({
+                status: false,
+                message: "The appointment not found"
+            })
+        }
+        const appointment = await appointmentModel.findById(appointmentId);
+        if (!appointment) {
+            return res.status(404).json({
+                status: false,
+                message: "The appointment not found"
+            })
+        }
+
+        if (!appointment.patientId.equals(req.user._id)) {
+            return res.status(403).json({
+                status: false,
+                message: "Not permitted to cancel appointment"
+            });
+        }
+
+        if (appointment.appointmentStatus !== 'pending') {
+            return res.status(400).json({
+                status: false,
+                message: "Not able to cancel the appointment"
+            })
+        }
+        appointment.appointmentStatus = "cancelled";
+        await appointment.save();
+
+        return res.status(200).json({
+            status: true,
+            message: "The appointment is cancelled"
+        })
+
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: true,
+            message: err.message
+        })
+    }
+}
+
 module.exports = {
     completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
-    , handleBookAppointment, allappointments
+    , handleBookAppointment, allappointments, cancelAppointment
 }
