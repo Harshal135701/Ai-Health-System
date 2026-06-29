@@ -490,7 +490,237 @@ async function cancelAppointment(req, res) {
     }
 }
 
+async function editAppointment(req, res) {
+    try {
+        const appointmentId = req.params.appointmentId;
+        return res.status(200).render("patient/editAppointment", { appointmentId })
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        })
+    }
+}
+
+async function editAppointmentPost(req, res) {
+    try {
+
+        const appointmentId = req.params.appointmentId;
+
+        const appointment = await appointmentModel.findById(appointmentId);
+
+        if (!appointment) {
+            return res.status(404).json({
+                status: false,
+                message: "Appointment not found."
+            });
+        }
+
+        if (!appointment.patientId.equals(req.user._id)) {
+            return res.status(403).json({
+                status: false,
+                message: "Not permitted to update this appointment."
+            });
+        }
+
+        if (appointment.appointmentStatus !== "pending") {
+            return res.status(400).json({
+                status: false,
+                message: "Only pending appointments can be updated."
+            });
+        }
+
+        const {
+            appointmentDate,
+            startTime,
+            endTime,
+            symptoms,
+            patientMessage
+        } = req.body;
+
+        if (
+            !appointmentDate ||
+            !startTime ||
+            !endTime ||
+            !symptoms ||
+            !patientMessage
+        ) {
+            return res.status(400).json({
+                status: false,
+                message: "Please provide all required fields."
+            });
+        }
+
+        const doctorId = appointment.doctorId;
+        const patientId = appointment.patientId;
+
+        const doctor = await doctorProfile.findById(doctorId);
+
+        if (!doctor) {
+            return res.status(404).json({
+                status: false,
+                message: "Doctor not found."
+            });
+        }
+
+        // Convert Time into Minutes
+
+        const [startHour, startMinute] = startTime.split(":").map(Number);
+        const [endHour, endMinute] = endTime.split(":").map(Number);
+
+        const appointmentStartTime =
+            startHour * 60 + startMinute;
+
+        const appointmentEndTime =
+            endHour * 60 + endMinute;
+
+        // Validate Start < End
+
+        if (appointmentStartTime >= appointmentEndTime) {
+            return res.status(400).json({
+                status: false,
+                message: "End time must be greater than start time."
+            });
+        }
+
+        // Validate Appointment Date
+
+        const requestedDate = new Date(appointmentDate);
+        requestedDate.setHours(0, 0, 0, 0);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (requestedDate < today) {
+            return res.status(400).json({
+                status: false,
+                message: "Cannot book appointment in the past."
+            });
+        }
+
+        // Find Requested Day
+
+        const requestedDay =
+            requestedDate.toLocaleDateString("en-US", {
+                weekday: "long"
+            });
+
+        // Doctor Available?
+
+        const availableSlot =
+            doctor.availability.find(
+                slot => slot.day === requestedDay
+            );
+
+        if (!availableSlot) {
+            return res.status(400).json({
+                status: false,
+                message: `Doctor is not available on ${requestedDay}.`
+            });
+        }
+
+        // Within Working Hours?
+
+        if (
+            appointmentStartTime < availableSlot.startTime ||
+            appointmentEndTime > availableSlot.endTime
+        ) {
+            return res.status(400).json({
+                status: false,
+                message: "Requested time is outside doctor's working hours."
+            });
+        }
+
+        // Get Start & End Of Day
+
+        const startOfDay = new Date(requestedDate);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(requestedDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        // Check Doctor Slot Conflict
+
+        const existingAppointments =
+            await appointmentModel.find({
+                doctorId,
+                _id: { $ne: appointmentId },
+                appointmentDate: {
+                    $gte: startOfDay,
+                    $lte: endOfDay
+                },
+                appointmentStatus: {
+                    $in: ["pending", "confirmed"]
+                }
+            });
+
+        for (const existingAppointment of existingAppointments) {
+
+            if (
+                appointmentStartTime < existingAppointment.endTime &&
+                appointmentEndTime > existingAppointment.startTime
+            ) {
+                return res.status(409).json({
+                    status: false,
+                    message: "Requested slot is already booked."
+                });
+            }
+        }
+
+        // Check Patient Slot Conflict
+
+        const patientAppointments =
+            await appointmentModel.find({
+                patientId,
+                // we are not checking the self exist appointment
+                _id: { $ne: appointmentId },
+                appointmentDate: {
+                    $gte: startOfDay,
+                    $lte: endOfDay
+                },
+                appointmentStatus: {
+                    $in: ["pending", "confirmed"]
+                }
+            });
+
+        for (const patientAppointment of patientAppointments) {
+
+            if (
+                appointmentStartTime < patientAppointment.endTime &&
+                appointmentEndTime > patientAppointment.startTime
+            ) {
+                return res.status(409).json({
+                    status: false,
+                    message: "You already have another appointment during this time."
+                });
+            }
+        }
+
+        appointment.appointmentDate = requestedDate;
+        appointment.startTime = appointmentStartTime;
+        appointment.endTime = appointmentEndTime;
+        appointment.symptoms = symptoms;
+        appointment.patientMessage = patientMessage;
+
+        await appointment.save();
+
+        return res.status(200).json({
+            status: true,
+            message: "Appointment updated successfully.",
+            appointment
+        });
+
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+    }
+}
+
 module.exports = {
     completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
-    , handleBookAppointment, allappointments, cancelAppointment
+    , handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost
 }

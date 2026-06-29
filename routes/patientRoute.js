@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router();
-const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment,allappointments,cancelAppointment } = require("../controllers/patientController")
+const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment, allappointments, cancelAppointment, editAppointment,editAppointmentPost } = require("../controllers/patientController")
 const { authMiddleware } = require("../middlewares/auth")
 const { roleMiddleware } = require("../middlewares/roleMiddleware");
 const { profileCompleted } = require("../middlewares/profileCompleted")
@@ -12,7 +12,9 @@ router.get("/Alldoctors", authMiddleware, roleMiddleware("patient"), Alldoctors)
 router.get("/doctors/:DoctorId", authMiddleware, roleMiddleware("patient"), completeDoctorInfo)
 router.get("/:DoctorId/appointment/booking", authMiddleware, roleMiddleware("patient"), bookAppointment)
 router.post("/appointment/book/:DoctorId", authMiddleware, roleMiddleware("patient"), profileCompleted, handleBookAppointment);
-router.get("/appointments",authMiddleware,roleMiddleware("patient"),allappointments)
-router.delete("/appointments/:appointmentId",authMiddleware,roleMiddleware("patient"),cancelAppointment)
+router.get("/appointments", authMiddleware, roleMiddleware("patient"), allappointments)
+router.delete("/appointments/:appointmentId", authMiddleware, roleMiddleware("patient"), cancelAppointment)
+router.get("/appointments/:appointmentId/edit", authMiddleware, roleMiddleware("patient"), editAppointment)
+router.put("/appointments/:appointmentId/edit",authMiddleware,roleMiddleware("patient"),editAppointmentPost)
 
 module.exports = router;
