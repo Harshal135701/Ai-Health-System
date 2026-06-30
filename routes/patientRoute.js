@@ -5,18 +5,29 @@ const { authMiddleware } = require("../middlewares/auth")
 const { roleMiddleware } = require("../middlewares/roleMiddleware");
 const { profileCompleted } = require("../middlewares/profileCompleted")
 
+// GET ROUTES
 router.get("/dashboard", authMiddleware, dashboardPage);
-router.post("/profile", authMiddleware, roleMiddleware("patient"), completeProfile);
 router.get("/CompleteProfile",authMiddleware,roleMiddleware("patient"),patientProfileGet)
-router.put("/updateProfile", authMiddleware, roleMiddleware("patient"), updateProfile);
 router.get("/updatePatientProfile",authMiddleware,roleMiddleware("patient"),updatePatientProfileGet)
 router.get("/Alldoctors", authMiddleware, roleMiddleware("patient"), Alldoctors);
 router.get("/doctors/:DoctorId", authMiddleware, roleMiddleware("patient"), completeDoctorInfo)
-router.get("/:DoctorId/appointmen   t/booking", authMiddleware, roleMiddleware("patient"), bookAppointment)
-router.post("/appointment/book/:DoctorId", authMiddleware, roleMiddleware("patient"), profileCompleted, handleBookAppointment);
-router.get("/appointments", authMiddleware, roleMiddleware("patient"), allappointments)
-router.delete("/appointments/:appointmentId", authMiddleware, roleMiddleware("patient"), cancelAppointment)
+router.get("/:DoctorId/appointment/booking", authMiddleware, roleMiddleware("patient"), bookAppointment)
 router.get("/appointments/:appointmentId/edit", authMiddleware, roleMiddleware("patient"), editAppointment)
+router.get("/appointments", authMiddleware, roleMiddleware("patient"), allappointments)
+
+
+// POST ROUTES
+router.post("/profile", authMiddleware, roleMiddleware("patient"), completeProfile);
+router.post("/appointment/book/:DoctorId", authMiddleware, roleMiddleware("patient"), profileCompleted, handleBookAppointment);
+
+
+// PUT ROUTES
+router.put("/updateProfile", authMiddleware, roleMiddleware("patient"), updateProfile);
 router.put("/appointments/:appointmentId/edit",authMiddleware,roleMiddleware("patient"),editAppointmentPost)
+
+
+// DELETE ROUTES
+router.delete("/appointments/:appointmentId", authMiddleware, roleMiddleware("patient"), cancelAppointment)
+
 
 module.exports = router;

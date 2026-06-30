@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Doctor Profile</title>
+</head>
+<body>
+
+    <h2>Complete Doctor Profile</h2>
+
+    <form id="doctorProfile">
+
+        <label>Specialization</label>
+        <input type="text" name="specialization">
+        <br><br>
+
+        <label>Experience</label>
+        <input type="number" name="experience">
+        <br><br>
+
+        <label>Hospital</label>
+        <input type="text" name="hospital">
+        <br><br>
+
+        <label>Education</label>
+        <input type="text" name="education">
+        <br><br>
+
+        <label>License Number</label>
+        <input type="text" name="licenseNumber">
+        <br><br>
+
+        <label>Consultation Fee</label>
+        <input type="number" name="consultationFee">
+        <br><br>
+
+        <h3>Availability</h3>
+
+        <div id="availabilityContainer">
+
+            <div class="availability-slot">
+
+                <select class="day">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+
+                <input type="time" class="startTime" placeholder="Start Time">
+
+                <input type="time" class="endTime" placeholder="End Time">
+
+                <button type="button" class="removeSlot">Remove</button>
+
+            </div>
+
+        </div>
+
+        <br>
+
+        <button type="button" id="addSlot">
+            + Add Availability
+        </button>
+
+        <br><br>
+
+        <button type="submit">
+            Complete Profile
+        </button>
+
+    </form>
+
+    <script src="/js/completeDoctorProfile.js"></script>
+
+</body>
+</html>

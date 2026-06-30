@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Doctor Profile</title>
+</head>
+<body>
+
+    <h2>Update Doctor Profile</h2>
+
+    <form id="updateProfileForm">
+
+        <label>Specialization</label>
+        <input type="text" name="specialization" value="<%= profile.specialization %>">
+        <br><br>
+
+        <label>Experience</label>
+        <input type="number" name="experience" value="<%= profile.experience %>">
+        <br><br>
+
+        <label>Hospital</label>
+        <input type="text" name="hospital" value="<%= profile.hospital %>">
+        <br><br>
+
+        <label>Education</label>
+        <input type="text" name="education" value="<%= profile.education %>">
+        <br><br>
+
+        <label>Consultation Fee</label>
+        <input type="number" name="consultationFee" value="<%= profile.consultationFee %>">
+        <br><br>
+
+        <h3>Availability</h3>
+
+        <div id="availabilityContainer">
+
+            <% profile.availability.forEach(function(slot) { %>
+                <div class="availability-slot">
+
+                    <select class="day">
+                        <option value="Monday" <%= slot.day === "Monday" ? "selected" : "" %>>Monday</option>
+                        <option value="Tuesday" <%= slot.day === "Tuesday" ? "selected" : "" %>>Tuesday</option>
+                        <option value="Wednesday" <%= slot.day === "Wednesday" ? "selected" : "" %>>Wednesday</option>
+                        <option value="Thursday" <%= slot.day === "Thursday" ? "selected" : "" %>>Thursday</option>
+                        <option value="Friday" <%= slot.day === "Friday" ? "selected" : "" %>>Friday</option>
+                        <option value="Saturday" <%= slot.day === "Saturday" ? "selected" : "" %>>Saturday</option>
+                        <option value="Sunday" <%= slot.day === "Sunday" ? "selected" : "" %>>Sunday</option>
+                    </select>
+
+                    <input type="time" class="startTime" value="<%= slot.startTime %>">
+
+                    <input type="time" class="endTime" value="<%= slot.endTime %>">
+
+                    <button type="button" class="removeSlot">Remove</button>
+
+                </div>
+            <% }); %>
+
+        </div>
+
+        <br>
+
+        <button type="button" id="addSlot">
+            + Add Availability
+        </button>
+
+        <br><br>
+
+        <button type="submit">
+            Update Profile
+        </button>
+
+    </form>
+
+    <script src="/js/updateDoctorProfile.js"></script>
+
+</body>
+</html>
