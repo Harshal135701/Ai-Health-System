@@ -20,7 +20,7 @@ async function completeProfile(req, res) {
                 message: "Profile already completed"
             })
         }
-        
+
         if (!gender || !bloodGroup || !allergies || !medicalHistory || !address) {
             return res.status(400).json({
                 status: false,
@@ -93,7 +93,6 @@ async function updateProfile(req, res) {
                 message: "No fields provided to update profile"
             })
         }
-
         const updatedProfile = await patientProfile.findOneAndUpdate(
             { userId: req.user._id },
             updateData,
@@ -746,8 +745,32 @@ async function patientProfileGet(req, res) {
     }
 }
 
+async function updatePatientProfileGet(req, res) {
+    try {
+        const userId = req.user;
+        const user = await patientProfile.findOne({ userId: userId });
+        if (!user) {
+            return res.status(200).json({
+                status: false,
+                message: "user profile is not created yet"
+            })
+        }
+        return res.status(200).render("patient/updateProfile", {
+            user,
+            status: true,
+            message: "user is logged in"
+        })
+    }
+    catch (err) {
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        })
+    }
+}
+
 module.exports = {
     completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
     , handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost,
-    patientProfileGet,
+    patientProfileGet, updatePatientProfileGet,
 }

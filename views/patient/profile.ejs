@@ -11,11 +11,11 @@
     <h2>GET ROUTE for patient profile </h2>
     <form id="completeProfile">
         <label>Age</label>
-        <input type="number" name="age">
+        <input type="number" name="age" required>
         <br>
 
         <label>gender</label>
-        <select name="gender">
+        <select name="gender" required>
             <option value="male">male</option>
             <option value="female">female</option>
             <option value="other">other</option>
@@ -23,17 +23,17 @@
         <br>
 
         <label>bloodGroup</label>
-        <input type="text" name="bloodGroup">
+        <input type="text" name="bloodGroup" required>
         <br>
 
         <label>allergies</label>
-        <input type="text" name="allergies">
+        <input type="text" name="allergies" required>
         <br>
         <label>medicalHistory</label>
-        <input type="text" name="medicalHistory">
+        <input type="text" name="medicalHistory" required>
         <br>
         <label>address</label>
-        <input type="text" name="address">
+        <input type="text" name="address" required>
         <br>
         <button type="submit">Create</button>
     </form>

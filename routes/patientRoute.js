@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router();
-const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment, allappointments, cancelAppointment, editAppointment,editAppointmentPost,patientProfileGet } = require("../controllers/patientController")
+const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment, allappointments, cancelAppointment, editAppointment,editAppointmentPost,patientProfileGet,updatePatientProfileGet } = require("../controllers/patientController")
 const { authMiddleware } = require("../middlewares/auth")
 const { roleMiddleware } = require("../middlewares/roleMiddleware");
 const { profileCompleted } = require("../middlewares/profileCompleted")
@@ -9,6 +9,7 @@ router.get("/dashboard", authMiddleware, dashboardPage);
 router.post("/profile", authMiddleware, roleMiddleware("patient"), completeProfile);
 router.get("/CompleteProfile",authMiddleware,roleMiddleware("patient"),patientProfileGet)
 router.put("/updateProfile", authMiddleware, roleMiddleware("patient"), updateProfile);
+router.get("/updatePatientProfile",authMiddleware,roleMiddleware("patient"),updatePatientProfileGet)
 router.get("/Alldoctors", authMiddleware, roleMiddleware("patient"), Alldoctors);
 router.get("/doctors/:DoctorId", authMiddleware, roleMiddleware("patient"), completeDoctorInfo)
 router.get("/:DoctorId/appointmen   t/booking", authMiddleware, roleMiddleware("patient"), bookAppointment)

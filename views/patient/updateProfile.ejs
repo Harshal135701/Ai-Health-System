@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Patient Update Profile</h2>
+    <form id="updateProfile">
+        <label>Age</label>
+        <input type="number" name="age" value="<%=user.age%>">
+        <br>
+
+        <label>gender</label>
+        <select name="gender">
+            <option value="male" <%=user.gender==="male" ? "selected" : "" %>>Male</option>
+            <option value="female" <%=user.gender==="female" ? "selected" : "" %>>Female</option>
+            <option value="other" <%=user.gender==="other" ? "selected" : "" %>>Other</option>
+        </select>
+        <br>
+
+        <label>bloodGroup</label>
+        <input type="text" name="bloodGroup" value="<%=user.bloodGroup%>">
+        <br>
+
+        <label>allergies</label>
+        <input type="text" name="allergies" value="<%=user.allergies%>">
+        <br>
+        <label>medicalHistory</label>
+        <input type="text" name="medicalHistory" value="<%=user.medicalHistory%>">
+        <br>
+        <label>address</label>
+        <input type="text" name="address" value="<%=user.address%>">
+        <br>
+        <button type="submit">Update</button>
+    </form>
+    <script src="/js/updatePatientProfile.js"></script>
+</body>
+
+</html>
