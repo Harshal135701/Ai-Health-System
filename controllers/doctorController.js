@@ -1,5 +1,6 @@
 const doctorProfileModel = require("../models/doctorProfile")
 const userModel = require("../models/user")
+const appointmentModel = require("../models/appointment")
 
 const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
 //  It just makes sure the string is a properly formatted 24-hour time
@@ -292,6 +293,26 @@ async function getProfileForUpdate(req, res) {
     }
 }
 
+async function allAppointments(req, res) {
+    try {
+        const doctorId = req.user._id;
+        const appointments = await appointmentModel
+            .find({ doctorId: req.user._id })
+            .populate("patientId", "name email phoneNo")
+            .sort({ appointmentDate: 1, startTime: 1 });
+        return res.status(200).render("doctor/allAppointments", {
+            appointments,
+            status: true
+        })
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send(err.message);
+
+    }
+}
+
 module.exports = {
-    completeProfile, updateProfile, dashboardPage, completeProfileGet,getProfileForUpdate
+    completeProfile, updateProfile, dashboardPage, completeProfileGet, getProfileForUpdate,
+    allAppointments
 }

@@ -325,7 +325,7 @@ async function handleBookAppointment(req, res) {
 
         const existingAppointments =
             await appointmentModel.find({
-                doctorId,
+                doctorId: doctor.userId,
                 appointmentDate: {
                     $gte: startOfDay,
                     $lte: endOfDay
@@ -378,7 +378,7 @@ async function handleBookAppointment(req, res) {
         const bookedAppointment =
             await appointmentModel.create({
 
-                doctorId,
+                doctorId: doctor.userId,
 
                 patientId,
 

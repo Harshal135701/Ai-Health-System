@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Appointments</title>
+</head>
+<body>
+
+    <h1>All Appointments</h1>
+
+    <% if (appointments.length === 0) { %>
+
+        <h3>No appointments found.</h3>
+
+    <% } else { %>
+
+        <% appointments.forEach(function(appointment){ %>
+
+            <hr>
+
+            <h3>Patient Details</h3>
+
+            <p>
+                <strong>Name:</strong>
+                <%= appointment.patientId.name %>
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                <%= appointment.patientId.email %>
+            </p>
+
+            <p>
+                <strong>Phone:</strong>
+                <%= appointment.patientId.phoneNo %>
+            </p>
+
+            <h3>Appointment Details</h3>
+
+            <p>
+                <strong>Date:</strong>
+                <%= appointment.appointmentDate.toDateString() %>
+            </p>
+
+            <p>
+                <strong>Start Time:</strong>
+                <%= appointment.startTime %> minutes
+            </p>
+
+            <p>
+                <strong>End Time:</strong>
+                <%= appointment.endTime %> minutes
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                <%= appointment.appointmentStatus %>
+            </p>
+
+            <p>
+                <strong>Symptoms:</strong>
+                <%= appointment.symptoms %>
+            </p>
+
+            <p>
+                <strong>Patient Message:</strong>
+                <%= appointment.patientMessage %>
+            </p>
+
+            <p>
+                <strong>Consultation Fee:</strong>
+                ₹<%= appointment.consultationFee %>
+            </p>
+
+        <% }) %>
+
+    <% } %>
+
+</body>
+</html>
