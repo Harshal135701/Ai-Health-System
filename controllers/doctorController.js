@@ -289,30 +289,143 @@ async function getProfileForUpdate(req, res) {
         });
 
     } catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).json({ message: err.message });
     }
 }
 
 async function allAppointments(req, res) {
     try {
         const doctorId = req.user._id;
+        const doctorProfile = await doctorProfileModel.findOne({
+            userId: req.user._id
+        });
+
+        if (!doctorProfile) {
+            return res.status(404).json({
+                status: false,
+                message: "Doctor profile not found."
+            });
+        }
+
         const appointments = await appointmentModel
-            .find({ doctorId: req.user._id })
+            .find({
+                doctorId: doctorProfile._id
+            })
             .populate("patientId", "name email phoneNo")
-            .sort({ appointmentDate: 1, startTime: 1 });
+            .sort({
+                appointmentDate: 1,
+                startTime: 1
+            });
         return res.status(200).render("doctor/allAppointments", {
             appointments,
             status: true
         })
     }
     catch (err) {
-        console.log(err);
-        return res.status(500).send(err.message);
+        return res.status(500).json({ message: err.message });
+    }
+}
+
+async function changeStatus(req, res) {
+    try {
+
+        const appointmentId = req.params.appointmentId;
+        const doctorUserId = req.user._id;
+
+        const doctor = await doctorProfileModel.findOne({
+            userId: doctorUserId
+        });
+
+        if (!doctor) {
+            return res.status(404).json({
+                status: false,
+                message: "Doctor profile not found."
+            });
+        }
+
+        const { appointmentStatus } = req.body;
+
+        if (!appointmentStatus) {
+            return res.status(400).json({
+                status: false,
+                message: "Appointment status is required."
+            });
+        }
+
+        const allowedStatus = [
+            "confirmed",
+            "rejected",
+            "completed"
+        ];
+
+        if (!allowedStatus.includes(appointmentStatus)) {
+            return res.status(400).json({
+                status: false,
+                message: "Invalid appointment status."
+            });
+        }
+
+        const appointment = await appointmentModel.findById(appointmentId);
+
+        if (!appointment) {
+            return res.status(404).json({
+                status: false,
+                message: "Appointment not found."
+            });
+        }
+
+        // Check appointment belongs to logged-in doctor
+        if (!appointment.doctorId.equals(doctor._id)) {
+            return res.status(403).json({
+                status: false,
+                message: "You are not authorized to update this appointment."
+            });
+        }
+
+        // Pending -> Confirmed / Rejected
+        if (
+            (appointmentStatus === "confirmed" ||
+                appointmentStatus === "rejected") &&
+            appointment.appointmentStatus !== "pending"
+        ) {
+            return res.status(400).json({
+                status: false,
+                message: `Cannot change ${appointment.appointmentStatus} appointment to ${appointmentStatus}.`
+            });
+        }
+
+        // Confirmed -> Completed
+        if (
+            appointmentStatus === "completed" &&
+            appointment.appointmentStatus !== "confirmed"
+        ) {
+            return res.status(400).json({
+                status: false,
+                message: "Only confirmed appointments can be completed."
+            });
+        }
+
+        appointment.appointmentStatus = appointmentStatus;
+
+        await appointment.save();
+
+        return res.status(200).json({
+            status: true,
+            message: "Appointment status updated successfully."
+        });
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
 
     }
 }
 
 module.exports = {
     completeProfile, updateProfile, dashboardPage, completeProfileGet, getProfileForUpdate,
-    allAppointments
+    allAppointments, changeStatus
 }

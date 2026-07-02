@@ -167,7 +167,7 @@ async function Alldoctors(req, res) {
 
 async function completeDoctorInfo(req, res) {
     try {
-        const id = req.params.DoctorId;
+        const id = req.params.DoctorUserId;
         const doctor = await doctorProfile.findOne({
             userId: id
         }).populate("userId")
@@ -186,7 +186,7 @@ async function completeDoctorInfo(req, res) {
 
 async function bookAppointment(req, res) {
     try {
-        const id = req.params.DoctorId;
+        const id = req.params.DoctorUserId;
         const doctor = await doctorProfile.findOne({
             userId: id
         }).populate("userId")
@@ -234,7 +234,7 @@ async function handleBookAppointment(req, res) {
 
         // Find Doctor
 
-        const doctorId = req.params.DoctorId;
+        const doctorId = req.params.DoctorUserId;
 
         const doctor = await doctorProfile.findById(doctorId);
 
@@ -325,7 +325,7 @@ async function handleBookAppointment(req, res) {
 
         const existingAppointments =
             await appointmentModel.find({
-                doctorId: doctor.userId,
+                doctorId: doctor._id,
                 appointmentDate: {
                     $gte: startOfDay,
                     $lte: endOfDay
@@ -378,7 +378,7 @@ async function handleBookAppointment(req, res) {
         const bookedAppointment =
             await appointmentModel.create({
 
-                doctorId: doctor.userId,
+                doctorId: doctor._id,
 
                 patientId,
 
@@ -435,6 +435,8 @@ async function allappointments(req, res) {
                 }
             })
             .sort({ appointmentDate: -1 });
+
+            console.log(allappointments);
 
         return res.status(200).render("patient/appointments", {
             status: true,

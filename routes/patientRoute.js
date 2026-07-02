@@ -10,15 +10,15 @@ router.get("/dashboard", authMiddleware, dashboardPage);
 router.get("/CompleteProfile",authMiddleware,roleMiddleware("patient"),patientProfileGet)
 router.get("/updatePatientProfile",authMiddleware,roleMiddleware("patient"),updatePatientProfileGet)
 router.get("/Alldoctors", authMiddleware, roleMiddleware("patient"), Alldoctors);
-router.get("/doctors/:DoctorId", authMiddleware, roleMiddleware("patient"), completeDoctorInfo)
-router.get("/:DoctorId/appointment/booking", authMiddleware, roleMiddleware("patient"), bookAppointment)
+router.get("/doctors/:DoctorUserId", authMiddleware, roleMiddleware("patient"), completeDoctorInfo)
+router.get("/:DoctorUserId/appointment/booking", authMiddleware, roleMiddleware("patient"), bookAppointment)
 router.get("/appointments/:appointmentId/edit", authMiddleware, roleMiddleware("patient"), editAppointment)
 router.get("/appointments", authMiddleware, roleMiddleware("patient"), allappointments)
 
 
 // POST ROUTES
 router.post("/profile", authMiddleware, roleMiddleware("patient"), completeProfile);
-router.post("/appointment/book/:DoctorId", authMiddleware, roleMiddleware("patient"), profileCompleted, handleBookAppointment);
+router.post("/appointment/book/:DoctorUserId", authMiddleware, roleMiddleware("patient"), profileCompleted, handleBookAppointment);
 
 
 // PUT ROUTES
