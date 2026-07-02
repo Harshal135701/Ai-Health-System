@@ -1,6 +1,7 @@
 const doctorProfileModel = require("../models/doctorProfile")
 const userModel = require("../models/user")
 const appointmentModel = require("../models/appointment")
+const sendStatusEmail = require("../services/mailService")
 
 const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
 //  It just makes sure the string is a properly formatted 24-hour time
@@ -365,7 +366,7 @@ async function changeStatus(req, res) {
             });
         }
 
-        const appointment = await appointmentModel.findById(appointmentId);
+        const appointment = await appointmentModel.findById(appointmentId).populate("patientId");
 
         if (!appointment) {
             return res.status(404).json({
@@ -406,6 +407,15 @@ async function changeStatus(req, res) {
         }
 
         appointment.appointmentStatus = appointmentStatus;
+        if (appointmentStatus === "confirmed" || appointmentStatus === "rejected") {
+            await sendStatusEmail(
+                appointment.patientId.email,
+                appointment.patientId.name,
+                req.user.name,
+                appointment.appointmentDate.toLocaleDateString("en-IN"),
+                appointmentStatus
+            );
+        }
 
         await appointment.save();
 

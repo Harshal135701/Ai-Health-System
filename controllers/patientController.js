@@ -436,7 +436,6 @@ async function allappointments(req, res) {
             })
             .sort({ appointmentDate: -1 });
 
-            console.log(allappointments);
 
         return res.status(200).render("patient/appointments", {
             status: true,
