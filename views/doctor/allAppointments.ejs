@@ -11,6 +11,38 @@
 
     <h1>All Appointments</h1>
 
+    <form action="/doctor/appointments" method="GET">
+
+        <select name="status" onchange="this.form.submit()">
+
+            <option value="all" <%=selectedStatus==="all" ? "selected" : "" %>>
+                All Appointments
+            </option>
+
+            <option value="today" <%=selectedStatus==="today" ? "selected" : "" %>>
+                Today's Appointments
+            </option>
+
+            <option value="pending" <%=selectedStatus==="pending" ? "selected" : "" %>>
+                Pending Appointments
+            </option>
+
+            <option value="confirmed" <%=selectedStatus==="confirmed" ? "selected" : "" %>>
+                Confirmed Appointments
+            </option>
+
+            <option value="rejected" <%=selectedStatus==="rejected" ? "selected" : "" %>>
+                Rejected Appointments
+            </option>
+
+            <option value="completed" <%=selectedStatus==="completed" ? "selected" : "" %>>
+                Completed Appointments
+            </option>
+
+        </select>
+
+    </form>
+
     <% if (appointments.length===0) { %>
 
         <h3>No appointments found.</h3>

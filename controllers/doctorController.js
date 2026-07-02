@@ -295,8 +295,9 @@ async function getProfileForUpdate(req, res) {
 }
 
 async function allAppointments(req, res) {
+
     try {
-        const doctorId = req.user._id;
+
         const doctorProfile = await doctorProfileModel.findOne({
             userId: req.user._id
         });
@@ -308,23 +309,67 @@ async function allAppointments(req, res) {
             });
         }
 
+        // const { status } = req.query;
+        // both works as a same but if query is undefined then 
+        // instead of empty it show all
+
+        const { status = "all" } = req.query;
+        const query = {
+            doctorId: doctorProfile._id
+        };
+
+        if (
+            status === "pending" ||
+            status === "confirmed" ||
+            status === "rejected" ||
+            status === "completed"
+        ) {
+            query.appointmentStatus = status;
+        }
+
+        if (status === "today") {
+
+            const today = new Date();
+
+            const startOfDay = new Date(today);
+            startOfDay.setHours(0, 0, 0, 0);
+            
+            // date.setHours(hours, minutes, seconds, milliseconds);
+
+            const endOfDay = new Date(today);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            query.appointmentStatus = "confirmed";
+
+            query.appointmentDate = {
+                $gte: startOfDay,
+                $lte: endOfDay
+            };
+        }
+
         const appointments = await appointmentModel
-            .find({
-                doctorId: doctorProfile._id
-            })
+            .find(query)
             .populate("patientId", "name email phoneNo")
             .sort({
                 appointmentDate: 1,
                 startTime: 1
             });
-        return res.status(200).render("doctor/allAppointments", {
+
+        return res.render("doctor/allAppointments", {
             appointments,
-            status: true
-        })
+            selectedStatus: status
+        });
+
     }
     catch (err) {
-        return res.status(500).json({ message: err.message });
+
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+
     }
+
 }
 
 async function changeStatus(req, res) {
