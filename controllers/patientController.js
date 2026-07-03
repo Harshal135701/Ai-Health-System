@@ -227,31 +227,87 @@ async function dashboardPage(req, res) {
 
     }
 }
-
 async function Alldoctors(req, res) {
     try {
 
-        const doctors = await userModel.find({
-            $and: [
-                { role: "doctor" },
-                { isProfileCompleted: true }
-            ]
-        })
+        const {
+            specialization,
+            minExperience,
+            feeRange
+        } = req.query;
 
-        if (doctors.length === 0) {
-            return res.status(404).json({
-                message: "Doctors not found"
-            })
+        const filter = {};
+
+        if (specialization) {
+            filter.specialization = specialization;
         }
+
+        if (minExperience) {
+            filter.experience = { $gte: Number(minExperience) };
+        }
+        
+        if (feeRange) {
+
+            switch (feeRange) {
+
+                case "0-500":
+                    filter.consultationFee = {
+                        $gte: 0,
+                        $lte: 500
+                    };
+                    break;
+
+                case "500-1000":
+                    filter.consultationFee = {
+                        $gte: 500,
+                        $lte: 1000
+                    };
+                    break;
+
+                case "1000-2000":
+                    filter.consultationFee = {
+                        $gte: 1000,
+                        $lte: 2000
+                    };
+                    break;
+
+                case "2000+":
+                    filter.consultationFee = {
+                        $gte: 2000
+                    };
+                    break;
+
+            }
+
+        }
+
+        const doctors = await doctorProfile
+            .find(filter)
+            .populate({
+                path: "userId",
+                match: {
+                    role: "doctor",
+                    isProfileCompleted: true
+                },
+                select: "name phoneNo email"
+            });
+
+        const filteredDoctors = doctors.filter(
+            doctor => doctor.userId !== null
+        );
+
         return res.status(200).render("patient/Alldoctors", {
-            doctors
+            doctors: filteredDoctors,
+            filters: req.query
         });
-    }
-    catch (err) {
+
+    } catch (err) {
+
         return res.status(500).json({
             status: false,
             message: err.message
-        })
+        });
+
     }
 }
 
