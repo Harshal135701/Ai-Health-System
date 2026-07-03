@@ -141,6 +141,72 @@
                 </div>
 
                 <% }) %>
+                    <hr>
+
+                    <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin:30px 0;">
+
+                        <!-- Previous -->
+
+                        <% if(currentPage> 1){ %>
+
+                            <a href="?page=<%= currentPage-1 %>
+        <% if(filters.specialization){ %>&specialization=<%= filters.specialization %><% } %>
+        <% if(filters.minExperience){ %>&minExperience=<%= filters.minExperience %><% } %>
+        <% if(filters.feeRange){ %>&feeRange=<%= filters.feeRange %><% } %>">
+                                << Previous </a>
+
+                                    <% } %>
+
+
+                                        <!-- Page Numbers -->
+
+                                        <% for(let i=1;i<=totalPages;i++){ %>
+
+                                            <% if(i===currentPage){ %>
+
+                                                <strong style="padding:8px 15px;
+                       border:1px solid black;
+                       background:black;
+                       color:white;
+                       border-radius:5px;">
+
+                                                    <%= i %>
+
+                                                </strong>
+
+                                                <% } else { %>
+
+                                                    <a href="?page=<%= i %>
+                <% if(filters.specialization){ %>&specialization=<%= filters.specialization %><% } %>
+                <% if(filters.minExperience){ %>&minExperience=<%= filters.minExperience %><% } %>
+                <% if(filters.feeRange){ %>&feeRange=<%= filters.feeRange %><% } %>" style="padding:8px 15px;
+                       border:1px solid black;
+                       border-radius:5px;
+                       text-decoration:none;">
+
+                                                        <%= i %>
+
+                                                    </a>
+
+                                                    <% } %>
+
+                                                        <% } %>
+
+
+                                                            <!-- Next -->
+
+                                                            <% if(currentPage < totalPages){ %>
+
+                                                                <a href="?page=<%= currentPage+1 %>
+        <% if(filters.specialization){ %>&specialization=<%= filters.specialization %><% } %>
+        <% if(filters.minExperience){ %>&minExperience=<%= filters.minExperience %><% } %>
+        <% if(filters.feeRange){ %>&feeRange=<%= filters.feeRange %><% } %>">
+                                                                    Next >>
+                                                                </a>
+
+                                                                <% } %>
+
+                    </div>
 </body>
 
 </html>

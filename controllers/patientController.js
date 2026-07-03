@@ -123,6 +123,7 @@ async function updateProfile(req, res) {
         })
     }
 }
+
 async function dashboardPage(req, res) {
     try {
 
@@ -227,14 +228,19 @@ async function dashboardPage(req, res) {
 
     }
 }
+
 async function Alldoctors(req, res) {
     try {
 
         const {
             specialization,
             minExperience,
-            feeRange
+            feeRange,
+            page = 1
         } = req.query;
+
+        const limit = 3;
+        const currentPage = Number(page);
 
         const filter = {};
 
@@ -243,9 +249,11 @@ async function Alldoctors(req, res) {
         }
 
         if (minExperience) {
-            filter.experience = { $gte: Number(minExperience) };
+            filter.experience = {
+                $gte: Number(minExperience)
+            };
         }
-        
+
         if (feeRange) {
 
             switch (feeRange) {
@@ -276,10 +284,13 @@ async function Alldoctors(req, res) {
                         $gte: 2000
                     };
                     break;
-
             }
 
         }
+
+        const totalDoctors = await doctorProfile.countDocuments(filter);
+
+        const totalPages = Math.ceil(totalDoctors / limit);
 
         const doctors = await doctorProfile
             .find(filter)
@@ -290,7 +301,9 @@ async function Alldoctors(req, res) {
                     isProfileCompleted: true
                 },
                 select: "name phoneNo email"
-            });
+            })
+            .skip((currentPage - 1) * limit)
+            .limit(limit);
 
         const filteredDoctors = doctors.filter(
             doctor => doctor.userId !== null
@@ -298,7 +311,9 @@ async function Alldoctors(req, res) {
 
         return res.status(200).render("patient/Alldoctors", {
             doctors: filteredDoctors,
-            filters: req.query
+            filters: req.query,
+            currentPage,
+            totalPages
         });
 
     } catch (err) {
