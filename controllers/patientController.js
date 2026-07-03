@@ -3,6 +3,17 @@ const patientProfile = require("../models/patientProfile")
 const doctorProfile = require("../models/doctorProfile")
 const appointmentModel = require("../models/appointment")
 
+function formatTime(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    const period = hours >= 12 ? "PM" : "AM";
+
+    const formattedHour = hours % 12 || 12;
+
+    return `${formattedHour}:${mins.toString().padStart(2, "0")} ${period}`;
+}
+
 async function completeProfile(req, res) {
     try {
         const { age, gender, bloodGroup, allergies, medicalHistory, address } = req.body;
@@ -112,29 +123,108 @@ async function updateProfile(req, res) {
         })
     }
 }
-
-
 async function dashboardPage(req, res) {
     try {
 
         const patient = req.user;
+
         if (!patient) {
             return res.status(404).json({
                 status: false,
-                message: "patient not found"
-            })
+                message: "Patient not found"
+            });
         }
+
+        // Helper function to convert minutes into HH:MM AM/PM format
+        function formatTime(minutes) {
+
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+
+            const period = hours >= 12 ? "PM" : "AM";
+            const formattedHour = hours % 12 || 12;
+
+            return `${formattedHour}:${mins.toString().padStart(2, "0")} ${period}`;
+        }
+
+        const appointments = await appointmentModel
+            .find({ patientId: patient._id })
+            .populate({
+                path: "doctorId",
+                populate: {
+                    path: "userId",
+                    select: "name email"
+                }
+            })
+            .sort({ appointmentDate: -1 });
+
+        const totalAppointments = appointments.length;
+
+        const pendingCount = appointments.filter(
+            appointment => appointment.appointmentStatus === "pending"
+        ).length;
+
+        const confirmedCount = appointments.filter(
+            appointment => appointment.appointmentStatus === "confirmed"
+        ).length;
+
+        const rejectedCount = appointments.filter(
+            appointment => appointment.appointmentStatus === "rejected"
+        ).length;
+
+        const today = new Date();
+
+        const upcomingAppointment = appointments.find(appointment => {
+            return (
+                appointment.appointmentStatus === "confirmed" &&
+                new Date(appointment.appointmentDate) >= today
+            );
+        });
+
+        // Format Upcoming Appointment Time
+        const formattedUpcomingAppointment = upcomingAppointment
+            ? {
+                ...upcomingAppointment.toObject(),
+                formattedStartTime: formatTime(upcomingAppointment.startTime),
+                formattedEndTime: formatTime(upcomingAppointment.endTime)
+            }
+            : null;
+
+        // Format Recent Appointments Time
+        const recentAppointments = appointments
+            .slice(0, 5)
+            .map(appointment => ({
+                ...appointment.toObject(),
+                formattedStartTime: formatTime(appointment.startTime),
+                formattedEndTime: formatTime(appointment.endTime)
+            }));
+
         return res.status(200).render("patient/dashboard", {
             patient,
+
+            totalAppointments,
+
+            pendingCount,
+
+            confirmedCount,
+
+            rejectedCount,
+
+            upcomingAppointment: formattedUpcomingAppointment,
+
+            recentAppointments,
+
             status: true,
-            message: "user is logged in"
-        })
-    }
-    catch (err) {
+            message: "Patient Dashboard"
+        });
+
+    } catch (err) {
+
         return res.status(500).json({
             status: false,
             message: err.message
-        })
+        });
+
     }
 }
 

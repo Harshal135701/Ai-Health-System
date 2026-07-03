@@ -222,28 +222,88 @@ async function updateProfile(req, res) {
         })
     }
 }
-
 async function dashboardPage(req, res) {
     try {
 
         const doctor = req.user;
+
         if (!doctor) {
             return res.status(404).json({
                 status: false,
                 message: "Doctor not found"
-            })
+            });
         }
+
+        // Get Doctor Profile
+        const doctorProfile = await doctorProfileModel.findOne({
+            userId: doctor._id
+        });
+
+        if (!doctorProfile) {
+            return res.status(404).json({
+                status: false,
+                message: "Doctor profile not found"
+            });
+        }
+
+        // Get all appointments
+        const appointments = await appointmentModel
+            .find({
+                doctorId: doctorProfile._id
+            })
+            .populate("patientId", "name email phoneNo")
+            .sort({ appointmentDate: -1 });
+
+        const totalAppointments = appointments.length;
+
+        const pendingCount = appointments.filter(
+            appointment => appointment.appointmentStatus === "pending"
+        ).length;
+
+        const confirmedCount = appointments.filter(
+            appointment => appointment.appointmentStatus === "confirmed"
+        ).length;
+
+        const rejectedCount = appointments.filter(
+            appointment => appointment.appointmentStatus === "rejected"
+        ).length;
+
+        const today = new Date().toDateString();
+
+        const todayAppointments = appointments.filter(appointment => {
+            return new Date(appointment.appointmentDate).toDateString() === today;
+        });
+
+        const recentAppointments = appointments.slice(0, 5);
+
         return res.status(200).render("doctor/dashboard", {
             doctor,
-            status: true,
-            message: "user is logged in"
-        })
+
+            totalAppointments,
+
+            todayCount: todayAppointments.length,
+
+            pendingCount,
+
+            confirmedCount,
+
+            rejectedCount,
+
+            todayAppointments,
+
+            recentAppointments,
+
+            status: true
+        });
+
     }
     catch (err) {
+
         return res.status(500).json({
             status: false,
             message: err.message
-        })
+        });
+
     }
 }
 

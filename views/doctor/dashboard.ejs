@@ -3,18 +3,87 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Doctor Dashboard</title>
 </head>
 
 <body>
-    <h1>Doctor Dashboard</h1>
-    <h3>Hello <%= doctor.name%>
-    </h3>
 
-    Total Appointments : 0
-    Today's Appointments : 0
-    Pending Appointments : 0
+    <h1>Doctor Dashboard</h1>
+
+    <h2>Welcome Dr. <%= doctor.name %></h2>
+
+    <hr>
+
+    <h3>Dashboard Statistics</h3>
+
+    <p>Total Appointments : <%= totalAppointments %></p>
+
+    <p>Today's Appointments : <%= todayCount %></p>
+
+    <p>Pending Appointments : <%= pendingCount %></p>
+
+    <p>Confirmed Appointments : <%= confirmedCount %></p>
+
+    <p>Rejected Appointments : <%= rejectedCount %></p>
+
+    <hr>
+
+    <h3>Today's Schedule</h3>
+
+    <% if(todayAppointments.length === 0){ %>
+
+        <p>No appointments today.</p>
+
+    <% } %>
+
+    <% todayAppointments.forEach(function(appointment){ %>
+
+        <div style="border:1px solid black; margin:10px; padding:10px;">
+
+            <p><strong>Patient :</strong> <%= appointment.patientId.name %></p>
+
+            <p><strong>Email :</strong> <%= appointment.patientId.email %></p>
+
+            <p><strong>Symptoms :</strong> <%= appointment.symptoms %></p>
+
+            <p><strong>Time :</strong>
+                <%= appointment.startTime %> -
+                <%= appointment.endTime %>
+            </p>
+
+            <p><strong>Status :</strong> <%= appointment.appointmentStatus %></p>
+
+        </div>
+
+    <% }) %>
+
+    <hr>
+
+    <h3>Recent Appointments</h3>
+
+    <% if(recentAppointments.length === 0){ %>
+
+        <p>No appointments found.</p>
+
+    <% } %>
+
+    <% recentAppointments.forEach(function(appointment){ %>
+
+        <div style="border:1px solid black; margin:10px; padding:10px;">
+
+            <p><strong>Patient :</strong> <%= appointment.patientId.name %></p>
+
+            <p><strong>Date :</strong>
+                <%= appointment.appointmentDate.toDateString() %>
+            </p>
+
+            <p><strong>Status :</strong>
+                <%= appointment.appointmentStatus %>
+            </p>
+
+        </div>
+
+    <% }) %>
 
 </body>
 

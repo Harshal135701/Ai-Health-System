@@ -3,20 +3,107 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Patient Dashboard</title>
 </head>
 
 <body>
+
     <h1>Patient Dashboard</h1>
 
-    <h3>Welcome <%=patient.name%></h3>
+    <h2>Welcome <%= patient.name %>
+    </h2>
 
-    Upcoming Appointments : 0
-    Completed Appointments : 0
+    <hr>
 
-    [ Book Appointment ]
-    [ My Appointments ]
+    <h3>Dashboard</h3>
+
+    <p>Total Appointments : <%= totalAppointments %>
+    </p>
+
+    <p>Pending : <%= pendingCount %>
+    </p>
+
+    <p>Confirmed : <%= confirmedCount %>
+    </p>
+
+    <p>Rejected : <%= rejectedCount %>
+    </p>
+
+    <hr>
+
+    <h3>Upcoming Appointment</h3>
+
+    <% if(upcomingAppointment){ %>
+
+        <p>
+            Doctor :
+            <%= upcomingAppointment.doctorId.userId.name %>
+        </p>
+
+        <p>
+            Specialization :
+            <%= upcomingAppointment.doctorId.specialization %>
+        </p>
+
+        <p>
+            Date :
+            <%= upcomingAppointment.appointmentDate.toDateString() %>
+        </p>
+
+        <p>
+            Time :
+            <%= upcomingAppointment.formattedStartTime %>
+                -
+                <%= upcomingAppointment.formattedEndTime %>
+        </p>
+
+        <% } else { %>
+
+            <p>No Upcoming Appointment</p>
+
+            <% } %>
+
+                <hr>
+
+                <h3>Recent Appointments</h3>
+
+                <% if(recentAppointments.length===0){ %>
+
+                    <p>No appointments found.</p>
+
+                    <% } %>
+
+                        <% recentAppointments.forEach(function(appointment){ %>
+
+                            <div style="border:1px solid black; margin:10px; padding:10px;">
+
+                                <p><strong>Doctor:</strong>
+                                    <%= appointment.doctorId.userId.name %>
+                                </p>
+
+                                <p><strong>Specialization:</strong>
+                                    <%= appointment.doctorId.specialization %>
+                                </p>
+
+                                <p><strong>Symptoms:</strong>
+                                    <%= appointment.symptoms %>
+                                </p>
+
+                                <p><strong>Status:</strong>
+                                    <%= appointment.appointmentStatus %>
+                                </p>
+
+                                <p><strong>Date:</strong>
+                                    <%= appointment.appointmentDate.toDateString() %>
+                                </p>
+                                <p>
+                                    <%= appointment.formattedStartTime %> -
+                                        <%= appointment.formattedEndTime %>
+                                </p>
+
+                            </div>
+
+                            <% }) %>
 
 </body>
 
