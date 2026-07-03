@@ -9,7 +9,7 @@
 
 <body>
     <h2>Patient Update Profile</h2>
-    <form id="updateProfile">
+    <form id="updateProfile" enctype="multipart/form-data">
         <label>Age</label>
         <input type="number" name="age" value="<%=user.age%>">
         <br>
@@ -35,6 +35,10 @@
         <label>address</label>
         <input type="text" name="address" value="<%=user.address%>">
         <br>
+        <label>Profile Picture</label>
+        <input type="file" name="profilePic" accept="image/*">
+
+        <br><br>
         <button type="submit">Update</button>
     </form>
     <script src="/js/updatePatientProfile.js"></script>

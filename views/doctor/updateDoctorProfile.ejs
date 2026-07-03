@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Doctor Profile</title>
 </head>
+
 <body>
 
     <h2>Update Doctor Profile</h2>
 
-    <form id="updateProfileForm">
+    <form id="updateProfileForm" enctype="multipart/form-data">
 
         <label>Specialization</label>
         <input type="text" name="specialization" value="<%= profile.specialization %>">
@@ -31,6 +33,11 @@
         <input type="number" name="consultationFee" value="<%= profile.consultationFee %>">
         <br><br>
 
+        <label>Profile Picture</label>
+        <input type="file" name="profilePic" accept="image/*">
+
+        <br><br>
+
         <h3>Availability</h3>
 
         <div id="availabilityContainer">
@@ -39,13 +46,13 @@
                 <div class="availability-slot">
 
                     <select class="day">
-                        <option value="Monday" <%= slot.day === "Monday" ? "selected" : "" %>>Monday</option>
-                        <option value="Tuesday" <%= slot.day === "Tuesday" ? "selected" : "" %>>Tuesday</option>
-                        <option value="Wednesday" <%= slot.day === "Wednesday" ? "selected" : "" %>>Wednesday</option>
-                        <option value="Thursday" <%= slot.day === "Thursday" ? "selected" : "" %>>Thursday</option>
-                        <option value="Friday" <%= slot.day === "Friday" ? "selected" : "" %>>Friday</option>
-                        <option value="Saturday" <%= slot.day === "Saturday" ? "selected" : "" %>>Saturday</option>
-                        <option value="Sunday" <%= slot.day === "Sunday" ? "selected" : "" %>>Sunday</option>
+                        <option value="Monday" <%=slot.day==="Monday" ? "selected" : "" %>>Monday</option>
+                        <option value="Tuesday" <%=slot.day==="Tuesday" ? "selected" : "" %>>Tuesday</option>
+                        <option value="Wednesday" <%=slot.day==="Wednesday" ? "selected" : "" %>>Wednesday</option>
+                        <option value="Thursday" <%=slot.day==="Thursday" ? "selected" : "" %>>Thursday</option>
+                        <option value="Friday" <%=slot.day==="Friday" ? "selected" : "" %>>Friday</option>
+                        <option value="Saturday" <%=slot.day==="Saturday" ? "selected" : "" %>>Saturday</option>
+                        <option value="Sunday" <%=slot.day==="Sunday" ? "selected" : "" %>>Sunday</option>
                     </select>
 
                     <input type="time" class="startTime" value="<%= slot.startTime %>">
@@ -55,7 +62,7 @@
                     <button type="button" class="removeSlot">Remove</button>
 
                 </div>
-            <% }); %>
+                <% }); %>
 
         </div>
 
@@ -76,4 +83,5 @@
     <script src="/js/updateDoctorProfile.js"></script>
 
 </body>
+
 </html>

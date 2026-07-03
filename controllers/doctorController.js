@@ -31,12 +31,21 @@ async function completeProfile(req, res) {
             availability
         } = req.body;
 
+        availability = JSON.parse(availability);
+
         const user = req.user;
 
         if (user.isProfileCompleted === true) {
             return res.status(409).json({
                 status: false,
                 message: "Profile already exists"
+            });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({
+                status: false,
+                message: "Profile picture is required"
             });
         }
 
@@ -114,7 +123,8 @@ async function completeProfile(req, res) {
             { _id: req.user._id },
             {
                 $set: {
-                    isProfileCompleted: true
+                    isProfileCompleted: true,
+                    profilePic: "/uploads/profiles/" + req.file.filename
                 }
             }
         );
@@ -133,27 +143,42 @@ async function completeProfile(req, res) {
 
     }
 }
-
 async function updateProfile(req, res) {
     try {
-        const { specialization, experience, hospital, education, consultationFee, availability } = req.body
 
-        const updateData = {}
+        let {
+            specialization,
+            experience,
+            hospital,
+            education,
+            consultationFee,
+            availability
+        } = req.body;
+
+        if (availability) {
+            availability = JSON.parse(availability);
+        }
+
+        const updateData = {};
 
         if (specialization) {
-            updateData.specialization = specialization
+            updateData.specialization = specialization;
         }
+
         if (experience !== undefined && experience !== null) {
-            updateData.experience = experience
+            updateData.experience = experience;
         }
+
         if (hospital) {
-            updateData.hospital = hospital
+            updateData.hospital = hospital;
         }
+
         if (education) {
-            updateData.education = education
+            updateData.education = education;
         }
+
         if (consultationFee !== undefined && consultationFee !== null) {
-            updateData.consultationFee = consultationFee
+            updateData.consultationFee = consultationFee;
         }
 
         if (availability) {
@@ -169,10 +194,14 @@ async function updateProfile(req, res) {
 
             for (const slot of availability) {
 
-                if (!slot.day || !TIME_REGEX.test(slot.startTime) || !TIME_REGEX.test(slot.endTime)) {
+                if (
+                    !slot.day ||
+                    !TIME_REGEX.test(slot.startTime) ||
+                    !TIME_REGEX.test(slot.endTime)
+                ) {
                     return res.status(400).json({
                         status: false,
-                        message: "Each slot needs a valid day, startTime and endTime (HH:MM)"
+                        message: "Each slot needs a valid day, startTime and endTime"
                     });
                 }
 
@@ -191,37 +220,61 @@ async function updateProfile(req, res) {
                     startTime: start,
                     endTime: end
                 });
+
             }
 
             updateData.availability = formattedAvailability;
+
         }
 
-        if (Object.keys(updateData).length === 0) {
+        if (Object.keys(updateData).length === 0 && !req.file) {
             return res.status(400).json({
                 status: false,
                 message: "No fields provided to update profile"
-            })
+            });
         }
 
         const updatedProfile = await doctorProfileModel.findOneAndUpdate(
-            { userId: req.user._id },
+            {
+                userId: req.user._id
+            },
             updateData,
-            { new: true }
+            {
+                new: true
+            }
         );
 
+        if (req.file) {
+
+            await userModel.updateOne(
+                {
+                    _id: req.user._id
+                },
+                {
+                    $set: {
+                        profilePic: "/uploads/profiles/" + req.file.filename
+                    }
+                }
+            );
+
+        }
+
         return res.status(200).json({
-            updatedProfile,
             status: true,
-            message: "Profile is updated"
-        })
-    }
-    catch (err) {
+            updatedProfile,
+            message: "Profile updated successfully"
+        });
+
+    } catch (err) {
+
         return res.status(500).json({
             status: false,
             message: err.message
-        })
+        });
+
     }
 }
+
 async function dashboardPage(req, res) {
     try {
 
@@ -393,7 +446,7 @@ async function allAppointments(req, res) {
 
             const startOfDay = new Date(today);
             startOfDay.setHours(0, 0, 0, 0);
-            
+
             // date.setHours(hours, minutes, seconds, milliseconds);
 
             const endOfDay = new Date(today);

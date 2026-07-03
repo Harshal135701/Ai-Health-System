@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Doctor Profile</title>
 </head>
+
 <body>
 
     <h2>Complete Doctor Profile</h2>
 
-    <form id="doctorProfile">
+    <form id="doctorProfile" enctype="multipart/form-data">
 
         <label>Specialization</label>
         <input type="text" name="specialization">
@@ -61,6 +63,11 @@
 
         </div>
 
+        <label>Profile Picture</label>
+        <input type="file" name="profilePic" accept="image/*" required>
+
+        <br><br>
+
         <br>
 
         <button type="button" id="addSlot">
@@ -78,4 +85,5 @@
     <script src="/js/completeDoctorProfile.js"></script>
 
 </body>
+
 </html>

@@ -13,114 +13,189 @@ function formatTime(minutes) {
 
     return `${formattedHour}:${mins.toString().padStart(2, "0")} ${period}`;
 }
-
 async function completeProfile(req, res) {
     try {
-        const { age, gender, bloodGroup, allergies, medicalHistory, address } = req.body;
-        if (age === null || age === undefined) {
-            return res.status(400).json({
-                status: false,
-                message: "Fields not exist"
-            })
-        }
-        const user = req.user;
 
-        if (user.isProfileCompleted === true) {
-            return res.status(200).json({
-                status: true,
-                message: "Profile already completed"
-            })
-        }
-
-        if (!gender || !bloodGroup || !allergies || !medicalHistory || !address) {
-            return res.status(400).json({
-                status: false,
-                message: "Fields not exist"
-            })
-        }
-
-        allergiesAre = req.body.allergies.split(",").map(item => item.trim());
-        medicalHistoryIs = req.body.medicalHistory.split(",").map(item => item.trim());
-
-        await patientProfile.create({
-            userId: req.user._id,
+        const {
             age,
             gender,
             bloodGroup,
-            allergies: allergiesAre,
-            medicalHistory: medicalHistoryIs,
+            allergies,
+            medicalHistory,
             address
-        })
+        } = req.body;
 
+        if (age === null || age === undefined) {
+            return res.status(400).json({
+                status: false,
+                message: "Age is required"
+            });
+        }
 
-        await userModel.updateOne({
-            _id: req.user._id
-        },
-            { $set: { isProfileCompleted: true } }
+        const user = req.user;
+
+        if (user.isProfileCompleted) {
+            return res.status(400).json({
+                status: false,
+                message: "Profile already completed"
+            });
+        }
+
+        if (
+            !gender ||
+            !bloodGroup ||
+            !allergies ||
+            !medicalHistory ||
+            !address
+        ) {
+            return res.status(400).json({
+                status: false,
+                message: "All fields are required"
+            });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({
+                status: false,
+                message: "Profile picture is required"
+            });
+        }
+
+        const allergiesAre = allergies
+            .split(",")
+            .map(item => item.trim());
+
+        const medicalHistoryIs = medicalHistory
+            .split(",")
+            .map(item => item.trim());
+
+        await patientProfile.create({
+
+            userId: user._id,
+
+            age,
+
+            gender,
+
+            bloodGroup,
+
+            allergies: allergiesAre,
+
+            medicalHistory: medicalHistoryIs,
+
+            address,
+
+        });
+
+        await userModel.updateOne(
+            { _id: user._id },
+            {
+                $set: {
+                    isProfileCompleted: true,
+                    profilePic: "/uploads/profiles/" + req.file.filename
+                }
+            }
         );
 
         return res.status(201).json({
             status: true,
-            message: "The profile is completed"
-        })
-    }
-    catch (err) {
+            message: "Profile completed successfully"
+        });
+
+    } catch (err) {
+
         return res.status(500).json({
             status: false,
             message: err.message
-        })
+        });
+
     }
 }
-
-
 async function updateProfile(req, res) {
     try {
-        const { age, gender, bloodGroup, allergies, medicalHistory, address } = req.body
 
-        const updateData = {}
+        const {
+            age,
+            gender,
+            bloodGroup,
+            allergies,
+            medicalHistory,
+            address
+        } = req.body;
+
+        const updateData = {};
+
+        if (age !== undefined && age !== null) {
+            updateData.age = age;
+        }
 
         if (gender) {
-            updateData.gender = gender
-        }
-        if (age !== undefined && age !== null) {
-            updateData.age = age
-        }
-        if (bloodGroup) {
-            updateData.bloodGroup = bloodGroup
-        }
-        if (allergies) {
-            updateData.allergies = allergies
-        }
-        if (medicalHistory) {
-            updateData.medicalHistory = medicalHistory
-        }
-        if (address) {
-            updateData.address = address
+            updateData.gender = gender;
         }
 
-        if (Object.keys(updateData).length === 0) {
+        if (bloodGroup) {
+            updateData.bloodGroup = bloodGroup;
+        }
+
+        if (allergies) {
+
+            updateData.allergies = allergies
+                .split(",")
+                .map(item => item.trim());
+
+        }
+
+        if (medicalHistory) {
+
+            updateData.medicalHistory = medicalHistory
+                .split(",")
+                .map(item => item.trim());
+
+        }
+
+        if (address) {
+            updateData.address = address;
+        }
+
+        if (Object.keys(updateData).length === 0 && !req.file) {
             return res.status(400).json({
                 status: false,
                 message: "No fields provided to update profile"
-            })
+            });
         }
+
         const updatedProfile = await patientProfile.findOneAndUpdate(
             { userId: req.user._id },
             updateData,
             { new: true }
         );
 
+        if (req.file) {
+
+            await userModel.updateOne(
+                { _id: req.user._id },
+                {
+                    $set: {
+                        profilePic: "/uploads/profiles/" + req.file.filename
+                    }
+                }
+            );
+
+        }
+
         return res.status(200).json({
-            updatedProfile,
             status: true,
-            message: "Profile is updated"
-        })
-    }
-    catch (err) {
+            updatedProfile,
+            message: "Profile updated successfully"
+        });
+
+    } catch (err) {
+
         return res.status(500).json({
             status: false,
             message: err.message
-        })
+        });
+
     }
 }
 

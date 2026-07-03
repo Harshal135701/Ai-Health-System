@@ -1,33 +1,44 @@
-const form = document.getElementById("updateProfile")
-form.addEventListener("submit", async function (e) {
-    e.preventDefault()
+const form = document.getElementById("updateProfile");
 
-    const isConfirmed = confirm("Update profile ?");
+form.addEventListener("submit", async function (e) {
+
+    e.preventDefault();
+
+    const isConfirmed = confirm("Update profile?");
     if (!isConfirmed) return;
 
-    const payload = {
-        age: form.age.value,
-        gender: form.gender.value,
-        bloodGroup: form.bloodGroup.value,
-        allergies: form.allergies.value,
-        medicalHistory: form.medicalHistory.value,
-        address: form.address.value
+    const formData = new FormData();
+
+    formData.append("age", form.age.value);
+    formData.append("gender", form.gender.value);
+    formData.append("bloodGroup", form.bloodGroup.value);
+    formData.append("allergies", form.allergies.value);
+    formData.append("medicalHistory", form.medicalHistory.value);
+    formData.append("address", form.address.value);
+
+    if (form.profilePic.files.length > 0) {
+
+        formData.append(
+            "profilePic",
+            form.profilePic.files[0]
+        );
+
     }
 
-    const response = await fetch(`/patient/updateProfile`, {
+    const response = await fetch("/patient/updateProfile", {
+
         method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    })
+
+        body: formData
+
+    });
 
     const data = await response.json();
 
     alert(data.message);
 
+    if (response.ok) {
+        window.location.reload();
+    }
 
-    window.location.reload();
-
-})
-
+});

@@ -1,14 +1,15 @@
 const express = require("express")
 const router = express.Router();
-const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment, allappointments, cancelAppointment, editAppointment,editAppointmentPost,patientProfileGet,updatePatientProfileGet } = require("../controllers/patientController")
+const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost, patientProfileGet, updatePatientProfileGet } = require("../controllers/patientController")
 const { authMiddleware } = require("../middlewares/auth")
 const { roleMiddleware } = require("../middlewares/roleMiddleware");
 const { profileCompleted } = require("../middlewares/profileCompleted")
+const upload = require("../middlewares/multer")
 
 // GET ROUTES
 router.get("/dashboard", authMiddleware, dashboardPage);
-router.get("/CompleteProfile",authMiddleware,roleMiddleware("patient"),patientProfileGet)
-router.get("/updatePatientProfile",authMiddleware,roleMiddleware("patient"),updatePatientProfileGet)
+router.get("/CompleteProfile", authMiddleware, roleMiddleware("patient"), patientProfileGet)
+router.get("/updatePatientProfile", authMiddleware, roleMiddleware("patient"), updatePatientProfileGet)
 router.get("/Alldoctors", authMiddleware, roleMiddleware("patient"), Alldoctors);
 router.get("/doctors/:DoctorUserId", authMiddleware, roleMiddleware("patient"), completeDoctorInfo)
 router.get("/:DoctorUserId/appointment/booking", authMiddleware, roleMiddleware("patient"), bookAppointment)
@@ -17,13 +18,13 @@ router.get("/appointments", authMiddleware, roleMiddleware("patient"), allappoin
 
 
 // POST ROUTES
-router.post("/profile", authMiddleware, roleMiddleware("patient"), completeProfile);
+router.post("/profile", authMiddleware, roleMiddleware("patient"), upload.single("profileImage"), completeProfile);
 router.post("/appointment/book/:DoctorUserId", authMiddleware, roleMiddleware("patient"), profileCompleted, handleBookAppointment);
 
 
 // PUT ROUTES
-router.put("/updateProfile", authMiddleware, roleMiddleware("patient"), updateProfile);
-router.put("/appointments/:appointmentId/edit",authMiddleware,roleMiddleware("patient"),editAppointmentPost)
+router.put("/updateProfile", authMiddleware, roleMiddleware("patient"), upload.single("profilePic"), updateProfile);
+router.put("/appointments/:appointmentId/edit", authMiddleware, roleMiddleware("patient"), editAppointmentPost)
 
 
 // DELETE ROUTES

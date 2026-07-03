@@ -21,7 +21,7 @@ const userSchema = mongoose.Schema({
     },
     profilePic: {
         type: String,
-        default: "./utils/profilePic"
+        default: "./uploads/profiles/profilePic"
     },
     role: {
         type: String,
