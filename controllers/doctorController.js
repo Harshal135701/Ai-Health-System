@@ -346,6 +346,10 @@ async function dashboardPage(req, res) {
 
             recentAppointments,
 
+            activePage: "dashboard",
+
+            user: req.user,
+
             status: true
         });
 
@@ -398,7 +402,9 @@ async function getProfileForUpdate(req, res) {
                 hospital: profile.hospital || "",
                 education: profile.education || "",
                 consultationFee: profile.consultationFee || 0,
-                availability
+                availability,
+                activePage: "updateDoctorProfile",
+                user: req.user,
             }
         });
 
@@ -470,7 +476,9 @@ async function allAppointments(req, res) {
 
         return res.render("doctor/allAppointments", {
             appointments,
-            selectedStatus: status
+            selectedStatus: status,
+            activePage: "appointments",
+            user: req.user,
         });
 
     }

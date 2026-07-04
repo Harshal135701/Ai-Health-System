@@ -2,6 +2,9 @@ const userModel = require("../models/user")
 const patientProfile = require("../models/patientProfile")
 const doctorProfile = require("../models/doctorProfile")
 const appointmentModel = require("../models/appointment")
+const notificationModel = require("../models/notification")
+const { getIO } = require("../config/socket")
+
 
 function formatTime(minutes) {
     const hours = Math.floor(minutes / 60);
@@ -13,6 +16,7 @@ function formatTime(minutes) {
 
     return `${formattedHour}:${mins.toString().padStart(2, "0")} ${period}`;
 }
+
 async function completeProfile(req, res) {
     try {
 
@@ -642,6 +646,41 @@ async function handleBookAppointment(req, res) {
 
                 consultationFee: doctor.consultationFee
             });
+
+
+        const notification = await notificationModel.create({
+
+            receiverId: doctor.userId,
+
+            senderId: patientId,
+
+            title: "New Appointment Request",
+
+            message: "A patient has booked a new appointment.",
+
+            type: "appointment",
+
+            referenceId: bookedAppointment._id
+
+        });
+
+        const io = getIO();
+
+        io.to(`doctor_${doctor.userId}`).emit("newNotification", {
+
+            _id: notification._id,
+
+            title: notification.title,
+
+            message: notification.message,
+
+            type: notification.type,
+
+            isRead: notification.isRead,
+
+            createdAt: notification.createdAt
+
+        });
 
         return res.status(201).json({
 

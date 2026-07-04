@@ -1,0 +1,463 @@
+/* =========================================
+                NAVBAR
+========================================= */
+
+.navbar{
+
+    position:fixed;
+
+    top:0;
+    left:260px;
+    right:0;
+
+    height:80px;
+
+    background:#ffffff;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 35px;
+
+    border-bottom:1px solid #e2e8f0;
+
+    z-index:1000;
+
+}
+
+/* =========================================
+            LEFT SECTION
+========================================= */
+
+.navbar-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+/* =========================================
+            SEARCH BOX
+========================================= */
+
+.search-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    width:360px;
+
+    background:#f8fafc;
+
+    padding:12px 18px;
+
+    border-radius:12px;
+
+    border:1px solid #e2e8f0;
+
+    transition:.3s;
+
+}
+
+.search-box:focus-within{
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.15);
+
+}
+
+.search-box i{
+
+    color:#64748b;
+
+    font-size:16px;
+
+}
+
+.search-box input{
+
+    width:100%;
+
+    border:none;
+
+    outline:none;
+
+    background:transparent;
+
+    font-size:15px;
+
+    color:#334155;
+
+}
+
+.search-box input::placeholder{
+
+    color:#94a3b8;
+
+}
+
+/* =========================================
+            RIGHT SECTION
+========================================= */
+
+.navbar-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:25px;
+
+}
+
+/* =========================================
+            USER INFO
+========================================= */
+
+.user-info{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.user-info img{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:2px solid #2563eb;
+
+}
+
+.user-info h4{
+
+    font-size:16px;
+
+    color:#1e293b;
+
+    margin-bottom:3px;
+
+}
+
+.user-info p{
+
+    font-size:13px;
+
+    color:#64748b;
+
+}
+
+/* =========================================
+            NOTIFICATION
+========================================= */
+
+.notification{
+
+    position:relative;
+
+}
+
+.notification-btn{
+
+    width:50px;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#f1f5f9;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    position:relative;
+
+}
+
+.notification-btn:hover{
+
+    background:#dbeafe;
+
+}
+
+.notification-btn i{
+
+    color:#2563eb;
+
+    font-size:20px;
+
+}
+
+/* =========================================
+                BADGE
+========================================= */
+
+.badge{
+
+    position:absolute;
+
+    top:-5px;
+
+    right:-5px;
+
+    width:22px;
+
+    height:22px;
+
+    background:#ef4444;
+
+    color:white;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:12px;
+
+    font-weight:bold;
+
+}
+
+/* =========================================
+        NOTIFICATION DROPDOWN
+========================================= */
+
+.notification-dropdown{
+
+    position:absolute;
+
+    right:0;
+
+    top:65px;
+
+    width:380px;
+
+    background:white;
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.12);
+
+    display:none;
+
+}
+
+.notification:hover .notification-dropdown{
+
+    display:block;
+
+}
+
+/* =========================================
+                HEADER
+========================================= */
+
+.notification-header{
+
+    background:#2563eb;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 20px;
+
+}
+
+.notification-header h3{
+
+    font-size:18px;
+
+}
+
+.notification-header a{
+
+    color:white;
+
+    text-decoration:none;
+
+    font-size:14px;
+
+}
+
+/* =========================================
+            NOTIFICATION LIST
+========================================= */
+
+.notification-list{
+
+    max-height:360px;
+
+    overflow-y:auto;
+
+}
+
+/* =========================================
+            NOTIFICATION ITEM
+========================================= */
+
+.notification-item{
+
+    display:flex;
+
+    gap:15px;
+
+    padding:18px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    border-bottom:1px solid #e2e8f0;
+
+}
+
+.notification-item:last-child{
+
+    border-bottom:none;
+
+}
+
+.notification-item:hover{
+
+    background:#f8fafc;
+
+}
+
+.notification-item.unread{
+
+    background:#eff6ff;
+
+}
+
+/* =========================================
+        NOTIFICATION ICON
+========================================= */
+
+.notification-icon{
+
+    width:45px;
+
+    height:45px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    flex-shrink:0;
+
+}
+
+.success{
+
+    background:#22c55e;
+
+}
+
+.warning{
+
+    background:#f59e0b;
+
+}
+
+.danger{
+
+    background:#ef4444;
+
+}
+
+/* =========================================
+        NOTIFICATION CONTENT
+========================================= */
+
+.notification-content{
+
+    flex:1;
+
+}
+
+.notification-content h4{
+
+    font-size:15px;
+
+    color:#1e293b;
+
+    margin-bottom:5px;
+
+}
+
+.notification-content p{
+
+    color:#64748b;
+
+    font-size:14px;
+
+    margin-bottom:8px;
+
+    line-height:1.4;
+
+}
+
+.notification-content span{
+
+    font-size:12px;
+
+    color:#94a3b8;
+
+}
+
+/* =========================================
+            SCROLLBAR
+========================================= */
+
+.notification-list::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+.notification-list::-webkit-scrollbar-thumb{
+
+    background:#cbd5e1;
+
+    border-radius:10px;
+
+}
