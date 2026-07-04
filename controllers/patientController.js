@@ -290,6 +290,10 @@ async function dashboardPage(req, res) {
 
             recentAppointments,
 
+            activePage: "dashboard",
+
+            user: req.user,
+
             status: true,
             message: "Patient Dashboard"
         });
@@ -303,11 +307,11 @@ async function dashboardPage(req, res) {
 
     }
 }
-
 async function Alldoctors(req, res) {
     try {
 
         const {
+            doctorName,
             specialization,
             minExperience,
             feeRange,
@@ -360,33 +364,41 @@ async function Alldoctors(req, res) {
                     };
                     break;
             }
-
         }
 
-        const totalDoctors = await doctorProfile.countDocuments(filter);
-
-        const totalPages = Math.ceil(totalDoctors / limit);
-
-        const doctors = await doctorProfile
-            .find(filter)
+        const doctors = await doctorProfile.find(filter)
             .populate({
                 path: "userId",
                 match: {
                     role: "doctor",
-                    isProfileCompleted: true
+                    isProfileCompleted: true,
+                    ...(doctorName && {
+                        name: {
+                            $regex: doctorName,
+                            $options: "i"
+                        }
+                    })
                 },
                 select: "name phoneNo email"
-            })
-            .skip((currentPage - 1) * limit)
-            .limit(limit);
+            });
 
         const filteredDoctors = doctors.filter(
             doctor => doctor.userId !== null
         );
 
+        const totalDoctors = filteredDoctors.length;
+        const totalPages = Math.ceil(totalDoctors / limit);
+
+        const paginatedDoctors = filteredDoctors.slice(
+            (currentPage - 1) * limit,
+            currentPage * limit
+        );
+
         return res.status(200).render("patient/Alldoctors", {
-            doctors: filteredDoctors,
+            doctors: paginatedDoctors,
             filters: req.query,
+            activePage: "Alldoctors",
+            user: req.user,
             currentPage,
             totalPages
         });
@@ -676,6 +688,7 @@ async function allappointments(req, res) {
         return res.status(200).render("patient/appointments", {
             status: true,
             appointments: allappointments,
+            activePage: "appointments",
             user
         });
 
@@ -970,6 +983,8 @@ async function editAppointmentPost(req, res) {
 async function patientProfileGet(req, res) {
     try {
         return res.status(200).render("patient/profile", {
+            activePage: "profile",
+            user: req.user,
             status: true,
             message: "user is logged in"
         })

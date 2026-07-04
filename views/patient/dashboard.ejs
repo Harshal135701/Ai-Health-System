@@ -3,107 +3,332 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Dashboard</title>
+
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
 
-    <h1>Patient Dashboard</h1>
+    <%- include("../partials/sidebar") %>
 
-    <h2>Welcome <%= patient.name %>
-    </h2>
+    <div class="main-content">
 
-    <hr>
+        <%- include("../partials/navbar") %>
 
-    <h3>Dashboard</h3>
+        <!-- Welcome Section -->
 
-    <p>Total Appointments : <%= totalAppointments %>
-    </p>
+        <section class="welcome-section">
 
-    <p>Pending : <%= pendingCount %>
-    </p>
+            <div>
 
-    <p>Confirmed : <%= confirmedCount %>
-    </p>
+                <h1>Welcome, <%= patient.name %> 👋</h1>
 
-    <p>Rejected : <%= rejectedCount %>
-    </p>
+                <p>
+                    Manage your appointments and stay updated with your healthcare.
+                </p>
 
-    <hr>
+            </div>
 
-    <h3>Upcoming Appointment</h3>
+        </section>
 
-    <% if(upcomingAppointment){ %>
+        <!-- Dashboard Cards -->
 
-        <p>
-            Doctor :
-            <%= upcomingAppointment.doctorId.userId.name %>
-        </p>
+        <section class="cards">
 
-        <p>
-            Specialization :
-            <%= upcomingAppointment.doctorId.specialization %>
-        </p>
+            <div class="card">
 
-        <p>
-            Date :
-            <%= upcomingAppointment.appointmentDate.toDateString() %>
-        </p>
+                <div class="card-icon blue">
 
-        <p>
-            Time :
-            <%= upcomingAppointment.formattedStartTime %>
-                -
-                <%= upcomingAppointment.formattedEndTime %>
-        </p>
+                    <i class="fa-solid fa-calendar-days"></i>
 
-        <% } else { %>
+                </div>
 
-            <p>No Upcoming Appointment</p>
+                <div>
 
-            <% } %>
+                    <h3>Total Appointments</h3>
 
-                <hr>
+                    <h2><%= totalAppointments %></h2>
 
-                <h3>Recent Appointments</h3>
+                </div>
 
-                <% if(recentAppointments.length===0){ %>
+            </div>
 
-                    <p>No appointments found.</p>
+            <div class="card">
+
+                <div class="card-icon orange">
+
+                    <i class="fa-solid fa-clock"></i>
+
+                </div>
+
+                <div>
+
+                    <h3>Pending</h3>
+
+                    <h2><%= pendingCount %></h2>
+
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-icon green">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                </div>
+
+                <div>
+
+                    <h3>Confirmed</h3>
+
+                    <h2><%= confirmedCount %></h2>
+
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-icon red">
+
+                    <i class="fa-solid fa-circle-xmark"></i>
+
+                </div>
+
+                <div>
+
+                    <h3>Rejected</h3>
+
+                    <h2><%= rejectedCount %></h2>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Upcoming Appointment -->
+
+        <section class="upcoming-section">
+
+            <div class="section-header">
+
+                <h2>Upcoming Appointment</h2>
+
+            </div>
+
+            <% if(upcomingAppointment){ %>
+
+                <div class="upcoming-card">
+
+                    <div class="doctor-image">
+
+                        <i class="fa-solid fa-user-doctor"></i>
+
+                    </div>
+
+                    <div class="doctor-info">
+
+                        <h3>
+                            Dr.
+                            <%= upcomingAppointment.doctorId.userId.name %>
+                        </h3>
+
+                        <p>
+
+                            <strong>Specialization :</strong>
+
+                            <%= upcomingAppointment.doctorId.specialization %>
+
+                        </p>
+
+                        <p>
+
+                            <strong>Date :</strong>
+
+                            <%= upcomingAppointment.appointmentDate.toDateString() %>
+
+                        </p>
+
+                        <p>
+
+                            <strong>Time :</strong>
+
+                            <%= upcomingAppointment.formattedStartTime %>
+
+                                -
+
+                                <%= upcomingAppointment.formattedEndTime %>
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <% } else { %>
+
+                    <div class="empty-card">
+
+                        <i class="fa-solid fa-calendar-xmark"></i>
+
+                        <h3>No Upcoming Appointment</h3>
+
+                        <p>
+                            Book an appointment to see it here.
+                        </p>
+
+                    </div>
 
                     <% } %>
 
-                        <% recentAppointments.forEach(function(appointment){ %>
+        </section>
 
-                            <div style="border:1px solid black; margin:10px; padding:10px;">
+        <!-- Recent Appointments -->
 
-                                <p><strong>Doctor:</strong>
-                                    <%= appointment.doctorId.userId.name %>
-                                </p>
+        <section class="recent-section">
 
-                                <p><strong>Specialization:</strong>
-                                    <%= appointment.doctorId.specialization %>
-                                </p>
+            <div class="section-header">
 
-                                <p><strong>Symptoms:</strong>
-                                    <%= appointment.symptoms %>
-                                </p>
+                <h2>Recent Appointments</h2>
 
-                                <p><strong>Status:</strong>
-                                    <%= appointment.appointmentStatus %>
-                                </p>
+            </div>
 
-                                <p><strong>Date:</strong>
-                                    <%= appointment.appointmentDate.toDateString() %>
-                                </p>
-                                <p>
-                                    <%= appointment.formattedStartTime %> -
-                                        <%= appointment.formattedEndTime %>
-                                </p>
+            <% if(recentAppointments.length===0){ %>
 
-                            </div>
+                <div class="empty-card">
 
-                            <% }) %>
+                    <i class="fa-solid fa-folder-open"></i>
+
+                    <h3>No Appointments Found</h3>
+
+                </div>
+
+                <% } else { %>
+
+                    <table class="appointment-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Doctor</th>
+
+                                <th>Specialization</th>
+
+                                <th>Symptoms</th>
+
+                                <th>Date</th>
+
+                                <th>Time</th>
+
+                                <th>Status</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <% recentAppointments.forEach(function(appointment){ %>
+
+                                <tr>
+
+                                    <td>
+
+                                        Dr.
+                                        <%= appointment.doctorId.userId.name %>
+
+                                    </td>
+
+                                    <td>
+
+                                        <%= appointment.doctorId.specialization %>
+
+                                    </td>
+
+                                    <td>
+
+                                        <%= appointment.symptoms %>
+
+                                    </td>
+
+                                    <td>
+
+                                        <%= appointment.appointmentDate.toDateString() %>
+
+                                    </td>
+
+                                    <td>
+
+                                        <%= appointment.formattedStartTime %>
+
+                                            -
+
+                                            <%= appointment.formattedEndTime %>
+
+                                    </td>
+
+                                    <td>
+
+                                        <% if(appointment.appointmentStatus==="confirmed"){ %>
+
+                                            <span class="status confirmed">
+
+                                                Confirmed
+
+                                            </span>
+
+                                            <% } else if(appointment.appointmentStatus==="pending"){ %>
+
+                                                <span class="status pending">
+
+                                                    Pending
+
+                                                </span>
+
+                                                <% } else if(appointment.appointmentStatus==="rejected"){ %>
+
+                                                    <span class="status rejected">
+
+                                                        Rejected
+
+                                                    </span>
+
+                                                    <% } else { %>
+
+                                                        <span class="status cancelled">
+
+                                                            <%= appointment.appointmentStatus %>
+
+                                                        </span>
+
+                                                        <% } %>
+
+                                    </td>
+
+                                </tr>
+
+                                <% }) %>
+
+                        </tbody>
+
+                    </table>
+
+                    <% } %>
+
+        </section>
+
+    </div>
 
 </body>
 

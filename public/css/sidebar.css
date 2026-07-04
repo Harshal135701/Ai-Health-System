@@ -1,0 +1,222 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f4f7fb;
+
+}
+
+.sidebar{
+
+    width:270px;
+    height:100vh;
+
+    position:fixed;
+    left:0;
+    top:0;
+
+    background:#1e293b;
+
+    display:flex;
+    flex-direction:column;
+
+    color:white;
+
+    box-shadow:0 0 15px rgba(0,0,0,.1);
+
+}
+
+/* Logo */
+
+.logo{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:12px;
+
+    padding:25px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.logo i{
+
+    font-size:28px;
+
+    color:#3b82f6;
+
+}
+
+.logo h2{
+
+    font-size:25px;
+
+}
+
+/* Profile */
+
+.profile{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    padding:30px 20px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.profile img{
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:4px solid #3b82f6;
+
+}
+
+.profile h3{
+
+    margin-top:15px;
+
+    font-size:19px;
+
+}
+
+.profile p{
+
+    color:#94a3b8;
+
+    margin-top:5px;
+
+}
+
+/* Menu */
+
+.sidebar ul{
+
+    list-style:none;
+
+    padding:25px 15px;
+
+    flex:1;
+
+}
+
+.sidebar ul li{
+
+    margin-bottom:12px;
+
+}
+
+.sidebar ul li a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    color:#cbd5e1;
+
+    text-decoration:none;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    transition:.3s;
+
+    font-size:16px;
+
+}
+
+.sidebar ul li a i{
+
+    width:22px;
+
+    text-align:center;
+
+    font-size:18px;
+
+}
+
+.sidebar ul li a:hover{
+
+    background:#334155;
+
+    color:white;
+
+}
+
+.sidebar ul li a.active{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+/* Logout */
+
+.logout{
+
+    padding:20px;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+.logout a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    text-decoration:none;
+
+    color:#ef4444;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    transition:.3s;
+
+}
+
+.logout a:hover{
+
+    background:#334155;
+
+}
+
+/* Main Content */
+
+.main-content{
+
+    margin-left:270px;
+
+    min-height:100vh;
+
+    padding:30px;
+
+}

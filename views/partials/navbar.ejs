@@ -1,0 +1,134 @@
+<nav class="navbar">
+
+    <div class="navbar-left">
+
+        <div class="search-box">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <form action="/patient/alldoctors" method="GET" class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="text" name="doctorName" placeholder="Search doctors..."
+                    value="<%= typeof filters !== 'undefined' ? (filters.doctorName || '') : '' %>">
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="navbar-right">
+
+        <!-- Notification -->
+
+        <div class="notification">
+
+            <button class="notification-btn">
+
+                <i class="fa-solid fa-bell"></i>
+
+                <span class="badge">3</span>
+
+            </button>
+
+            <div class="notification-dropdown">
+
+                <div class="notification-header">
+
+                    <h3>Notifications</h3>
+
+                    <a href="/patient/notifications">View All</a>
+
+                </div>
+
+                <div class="notification-list">
+
+                    <div class="notification-item unread">
+
+                        <div class="notification-icon success">
+
+                            <i class="fa-solid fa-circle-check"></i>
+
+                        </div>
+
+                        <div class="notification-content">
+
+                            <h4>Appointment Confirmed</h4>
+
+                            <p>Dr. Rahul Sharma has confirmed your appointment.</p>
+
+                            <span>2 min ago</span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="notification-item unread">
+
+                        <div class="notification-icon warning">
+
+                            <i class="fa-solid fa-calendar-days"></i>
+
+                        </div>
+
+                        <div class="notification-content">
+
+                            <h4>Appointment Tomorrow</h4>
+
+                            <p>Your appointment is scheduled for tomorrow at 10:00 AM.</p>
+
+                            <span>1 hour ago</span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="notification-item">
+
+                        <div class="notification-icon danger">
+
+                            <i class="fa-solid fa-circle-xmark"></i>
+
+                        </div>
+
+                        <div class="notification-content">
+
+                            <h4>Appointment Rejected</h4>
+
+                            <p>Dr. Amit rejected your appointment request.</p>
+
+                            <span>Yesterday</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- User -->
+
+        <div class="user-info">
+
+            <img src="<%= user.profilePic %>" alt="Profile">
+
+            <div>
+
+                <h4>
+                    <%= user.name %>
+                </h4>
+
+                <p>Patient</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
