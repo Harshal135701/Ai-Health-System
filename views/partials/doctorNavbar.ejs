@@ -8,10 +8,7 @@
 
             <i class="fa-solid fa-magnifying-glass"></i>
 
-            <input
-                type="text"
-                name="search"
-                placeholder="Search patients..."
+            <input type="text" name="search" placeholder="Search patients..."
                 value="<%= typeof filters !== 'undefined' ? (filters.search || '') : '' %>">
 
         </form>
@@ -76,8 +73,7 @@
 
         <div class="user-info">
 
-            <img
-                src="<%= user.profilePic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=2563eb&color=fff' %>"
+            <img src="<%= user.profilePic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=2563eb&color=fff' %>"
                 alt="Doctor">
 
             <div>
@@ -96,11 +92,124 @@
 
 </nav>
 
+<!-- NOTIFICATION -->
+
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
 
     const socket = io();
+
+    function renderNotification(notification) {
+
+        const notificationList =
+            document.getElementById("notificationList");
+
+        // Remove "No Notifications"
+        if (
+            notificationList.children.length === 1 &&
+            notificationList.children[0].querySelector("h4").innerText === "No Notifications"
+        ) {
+            notificationList.innerHTML = "";
+        }
+
+        const notificationItem = document.createElement("div");
+
+        notificationItem.className = "notification-item";
+
+        if (!notification.isRead) {
+            notificationItem.classList.add("unread");
+        }
+
+        notificationItem.innerHTML = `
+
+        <div class="notification-icon warning">
+
+            <i class="fa-solid fa-calendar-check"></i>
+
+        </div>
+
+        <div class="notification-content">
+
+            <h4>${notification.title}</h4>
+
+            <p>${notification.message}</p>
+
+            <span>${new Date(notification.createdAt).toLocaleString()}</span>
+
+        </div>
+
+    `;
+
+        notificationList.prepend(notificationItem);
+    }
+
+
+    async function loadNotifications() {
+
+        try {
+
+            const response = await fetch("/doctor/notifications");
+
+            const data = await response.json();
+
+            const notificationList =
+                document.getElementById("notificationList");
+
+            notificationList.innerHTML = "";
+
+            if (data.notifications.length === 0) {
+
+                notificationList.innerHTML = `
+
+        <div class="notification-item">
+
+            <div class="notification-icon success">
+
+                <i class="fa-solid fa-bell"></i>
+
+            </div>
+
+            <div class="notification-content">
+
+                <h4>No Notifications</h4>
+
+                <p>You don't have any notifications yet.</p>
+
+                <span>Just Now</span>
+
+            </div>
+
+        </div>
+
+    `;
+
+                badge.innerText = 0;
+
+                return;
+            }
+
+            if (!data.status) return;
+
+            const badge = document.getElementById("notificationBadge");
+
+            const unreadCount =
+                data.notifications.filter(notification => !notification.isRead).length;
+
+            badge.innerText = unreadCount;
+
+            data.notifications.forEach(notification => {
+                renderNotification(notification);
+            });
+
+        } catch (err) {
+
+            console.error(err);
+
+        }
+
+    }
+
 
     socket.on("connect", () => {
 
@@ -113,7 +222,7 @@
             role: "<%= user.role %>"
 
         });
-
+        loadNotifications();
     });
 
     socket.on("roomJoined", (data) => {
@@ -126,52 +235,12 @@
 
         console.log(notification);
 
-        // Badge
-
+        // Update badge
         const badge = document.getElementById("notificationBadge");
-
         badge.innerText = Number(badge.innerText) + 1;
 
-        // Notification List
-
-        const notificationList =
-            document.getElementById("notificationList");
-
-        // Remove "No Notifications"
-
-        if (notificationList.children.length === 1 &&
-            notificationList.children[0].querySelector("h4").innerText === "No Notifications") {
-
-            notificationList.innerHTML = "";
-
-        }
-
-        const notificationItem = document.createElement("div");
-
-        notificationItem.className =
-            "notification-item unread";
-
-        notificationItem.innerHTML = `
-
-            <div class="notification-icon warning">
-
-                <i class="fa-solid fa-calendar-check"></i>
-
-            </div>
-
-            <div class="notification-content">
-
-                <h4>${notification.title}</h4>
-
-                <p>${notification.message}</p>
-
-                <span>Just Now</span>
-
-            </div>
-
-        `;
-
-        notificationList.prepend(notificationItem);
+        // Render notification
+        renderNotification(notification);
 
     });
 

@@ -2,6 +2,7 @@ const doctorProfileModel = require("../models/doctorProfile")
 const userModel = require("../models/user")
 const appointmentModel = require("../models/appointment")
 const sendStatusEmail = require("../services/mailService")
+const notificationModel = require("../models/notification")
 
 const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
 //  It just makes sure the string is a properly formatted 24-hour time
@@ -601,7 +602,31 @@ async function changeStatus(req, res) {
     }
 }
 
+async function handleGetNotifications(req, res) {
+    try {
+
+        const notifications = await notificationModel
+            .find({ receiverId: req.user._id })
+            .populate("senderId", "name profilePic")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            status: true,
+            notifications
+        });
+
+    } catch (err) {
+
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+
+    }
+}
+
+
 module.exports = {
     completeProfile, updateProfile, dashboardPage, completeProfileGet, getProfileForUpdate,
-    allAppointments, changeStatus
+    allAppointments, changeStatus, handleGetNotifications
 }

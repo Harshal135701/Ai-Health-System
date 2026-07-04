@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Doctor Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- CSS -->
     <link rel="stylesheet" href="/css/doctorNavbar.css">
     <link rel="stylesheet" href="/css/doctorSidebar.css">
     <link rel="stylesheet" href="/css/doctorDashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
@@ -16,107 +16,130 @@
     <!-- Navbar -->
     <%- include('../partials/doctorNavbar') %>
 
-    <div class="dashboard-container">
+        <div class="dashboard-container">
 
-        <!-- Sidebar -->
-        <%- include('../partials/doctorSidebar') %>
+            <!-- Sidebar -->
+            <%- include('../partials/doctorSidebar') %>
 
-        <!-- Main Content -->
-        <div class="main-content">
+                <!-- Main Content -->
+                <div class="main-content">
 
-            <h2 class="welcome-text">Welcome Dr. <%= doctor.name %></h2>
+                    <h2 class="welcome-text">Welcome Dr. <%= doctor.name %>
+                    </h2>
 
-            <div class="stats-grid">
+                    <div class="stats-grid">
 
-                <div class="stat-card">
-                    <h3>Total Appointments</h3>
-                    <p><%= totalAppointments %></p>
-                </div>
+                        <div class="stat-card">
+                            <h3>Total Appointments</h3>
+                            <p>
+                                <%= totalAppointments %>
+                            </p>
+                        </div>
 
-                <div class="stat-card">
-                    <h3>Today's Appointments</h3>
-                    <p><%= todayCount %></p>
-                </div>
+                        <div class="stat-card">
+                            <h3>Today's Appointments</h3>
+                            <p>
+                                <%= todayCount %>
+                            </p>
+                        </div>
 
-                <div class="stat-card">
-                    <h3>Pending</h3>
-                    <p><%= pendingCount %></p>
-                </div>
+                        <div class="stat-card">
+                            <h3>Pending</h3>
+                            <p>
+                                <%= pendingCount %>
+                            </p>
+                        </div>
 
-                <div class="stat-card">
-                    <h3>Confirmed</h3>
-                    <p><%= confirmedCount %></p>
-                </div>
+                        <div class="stat-card">
+                            <h3>Confirmed</h3>
+                            <p>
+                                <%= confirmedCount %>
+                            </p>
+                        </div>
 
-                <div class="stat-card">
-                    <h3>Rejected</h3>
-                    <p><%= rejectedCount %></p>
-                </div>
-
-            </div>
-
-            <hr>
-
-            <h3>Today's Schedule</h3>
-
-            <% if(todayAppointments.length === 0){ %>
-                <p>No appointments today.</p>
-            <% } %>
-
-            <div class="appointment-list">
-
-                <% todayAppointments.forEach(function(appointment){ %>
-
-                    <div class="appointment-card">
-
-                        <p><strong>Patient:</strong> <%= appointment.patientId.name %></p>
-                        <p><strong>Email:</strong> <%= appointment.patientId.email %></p>
-                        <p><strong>Symptoms:</strong> <%= appointment.symptoms %></p>
-
-                        <p>
-                            <strong>Time:</strong>
-                            <%= appointment.startTime %> - <%= appointment.endTime %>
-                        </p>
-
-                        <p><strong>Status:</strong> <%= appointment.appointmentStatus %></p>
+                        <div class="stat-card">
+                            <h3>Rejected</h3>
+                            <p>
+                                <%= rejectedCount %>
+                            </p>
+                        </div>
 
                     </div>
 
-                <% }) %>
+                    <hr>
 
-            </div>
+                    <h3>Today's Schedule</h3>
 
-            <hr>
+                    <% if(todayAppointments.length===0){ %>
+                        <p>No appointments today.</p>
+                        <% } %>
 
-            <h3>Recent Appointments</h3>
+                            <div class="appointment-list">
 
-            <% if(recentAppointments.length === 0){ %>
-                <p>No appointments found.</p>
-            <% } %>
+                                <% todayAppointments.forEach(function(appointment){ %>
 
-            <div class="appointment-list">
+                                    <div class="appointment-card">
 
-                <% recentAppointments.forEach(function(appointment){ %>
+                                        <p><strong>Patient:</strong>
+                                            <%= appointment.patientId.name %>
+                                        </p>
+                                        <p><strong>Email:</strong>
+                                            <%= appointment.patientId.email %>
+                                        </p>
+                                        <p><strong>Symptoms:</strong>
+                                            <%= appointment.symptoms %>
+                                        </p>
 
-                    <div class="appointment-card">
+                                        <p>
+                                            <strong>Time:</strong>
+                                            <%= appointment.startTime %> - <%= appointment.endTime %>
+                                        </p>
 
-                        <p><strong>Patient:</strong> <%= appointment.patientId.name %></p>
+                                        <p><strong>Status:</strong>
+                                            <%= appointment.appointmentStatus %>
+                                        </p>
 
-                        <p>
-                            <strong>Date:</strong>
-                            <%= appointment.appointmentDate.toDateString() %>
-                        </p>
+                                    </div>
 
-                        <p><strong>Status:</strong> <%= appointment.appointmentStatus %></p>
+                                    <% }) %>
 
-                    </div>
+                            </div>
 
-                <% }) %>
+                            <hr>
 
-            </div>
+                            <h3>Recent Appointments</h3>
 
+                            <% if(recentAppointments.length===0){ %>
+                                <p>No appointments found.</p>
+                                <% } %>
+
+                                    <div class="appointment-list">
+
+                                        <% recentAppointments.forEach(function(appointment){ %>
+
+                                            <div class="appointment-card">
+
+                                                <p><strong>Patient:</strong>
+                                                    <%= appointment.patientId.name %>
+                                                </p>
+
+                                                <p>
+                                                    <strong>Date:</strong>
+                                                    <%= appointment.appointmentDate.toDateString() %>
+                                                </p>
+
+                                                <p><strong>Status:</strong>
+                                                    <%= appointment.appointmentStatus %>
+                                                </p>
+
+                                            </div>
+
+                                            <% }) %>
+
+                                    </div>
+
+                </div>
         </div>
-    </div>
 
 </body>
 
