@@ -37,7 +37,7 @@
 
                     <h3>Notifications</h3>
 
-                    <a href="#">View All</a>
+                    <a href="/doctor/notifications/page">View All</a>
 
                 </div>
 
@@ -95,10 +95,10 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
-window.currentUser = {
-    id: "<%= user._id %>",
-    role: "<%= user.role %>"
-};
+    window.currentUser = {
+        id: "<%= user._id %>",
+        role: "<%= user.role %>"
+    };
 </script>
 
 <script src="/js/notification.js"></script>

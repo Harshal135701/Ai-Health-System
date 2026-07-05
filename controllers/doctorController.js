@@ -684,8 +684,38 @@ async function handleMarkNotificationAsRead(req, res) {
 
 }
 
+async function handleNotificationPage(req, res) {
+
+    try {
+
+        const notifications = await notificationModel
+            .find({
+                receiverId: req.user._id
+            })
+            .populate("senderId", "name profilePic")
+            .sort({
+                createdAt: -1
+            });
+
+        return res.render(
+            "doctor/doctorNotifications",
+            {
+                user: req.user,
+                notifications
+            }
+        );
+
+    } catch (err) {
+
+        return res.status(500).send(err.message);
+
+    }
+
+}
+
 
 module.exports = {
     completeProfile, updateProfile, dashboardPage, completeProfileGet, getProfileForUpdate,
-    allAppointments, changeStatus, handleGetNotifications,handleMarkNotificationAsRead
+    allAppointments, changeStatus, handleGetNotifications,handleMarkNotificationAsRead,
+    handleNotificationPage
 }
