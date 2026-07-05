@@ -1,6 +1,8 @@
 const express = require("express")
 const router = express.Router();
-const { completeProfile, updateProfile, dashboardPage, completeProfileGet, getProfileForUpdate, allAppointments, changeStatus,handleGetNotifications } = require("../controllers/doctorController")
+const { completeProfile, updateProfile, dashboardPage, completeProfileGet, getProfileForUpdate, allAppointments, changeStatus,handleGetNotifications,
+    handleMarkNotificationAsRead
+ } = require("../controllers/doctorController")
 const { authMiddleware } = require("../middlewares/auth")
 const { roleMiddleware } = require("../middlewares/roleMiddleware");
 const upload = require("../middlewares/multer")
@@ -17,4 +19,7 @@ router.post("/profile", authMiddleware, roleMiddleware("doctor"), upload.single(
 
 router.put("/updateProfile", authMiddleware, roleMiddleware("doctor"), upload.single("profilePic"), updateProfile);
 router.put("/appointments/:appointmentId/status", authMiddleware, roleMiddleware("doctor"), changeStatus)
+
+router.patch("/notifications/:notificationId/read",authMiddleware,roleMiddleware('doctor'),handleMarkNotificationAsRead);
+
 module.exports = router;

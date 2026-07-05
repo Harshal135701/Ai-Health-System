@@ -625,8 +625,67 @@ async function handleGetNotifications(req, res) {
     }
 }
 
+async function handleMarkNotificationAsRead(req, res) {
+
+    try {
+
+        const { notificationId } = req.params;
+
+        const notification =
+            await notificationModel.findOneAndUpdate(
+
+                {
+                    _id: notificationId,
+                    receiverId: req.user._id
+                },
+
+                {
+                    isRead: true
+                },
+
+                {
+                    new: true
+                }
+
+            );
+
+        if (!notification) {
+
+            return res.status(404).json({
+
+                status: false,
+
+                message: "Notification not found."
+
+            });
+
+        }
+
+        return res.status(200).json({
+
+            status: true,
+
+            notification
+
+        });
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+
+            status: false,
+
+            message: err.message
+
+        });
+
+    }
+
+}
+
 
 module.exports = {
     completeProfile, updateProfile, dashboardPage, completeProfileGet, getProfileForUpdate,
-    allAppointments, changeStatus, handleGetNotifications
+    allAppointments, changeStatus, handleGetNotifications,handleMarkNotificationAsRead
 }

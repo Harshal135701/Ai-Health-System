@@ -13,9 +13,22 @@ const notificationSchema = new mongoose.Schema(
             ref: "user",
             required: true
         },
-        
+
+        // Related document (Appointment, Chat, Prescription, etc.)
         referenceId: {
             type: mongoose.Schema.Types.ObjectId,
+            default: null
+        },
+
+        // Collection name of the related document
+        referenceModel: {
+            type: String,
+            enum: [
+                "appointment",
+                "chat",
+                "prescription",
+                "payment"
+            ],
             default: null
         },
 
@@ -36,11 +49,20 @@ const notificationSchema = new mongoose.Schema(
                 "appointment_confirmed",
                 "appointment_rejected",
                 "appointment_cancelled",
-                "reminder",
+                "appointment_completed",
+                "chat",
+                "prescription",
                 "payment",
+                "reminder",
                 "system"
             ],
             required: true
+        },
+
+        // Frontend will redirect here when notification is clicked
+        redirectUrl: {
+            type: String,
+            default: null
         },
 
         isRead: {

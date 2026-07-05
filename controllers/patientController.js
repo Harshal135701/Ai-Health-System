@@ -483,6 +483,7 @@ async function handleBookAppointment(req, res) {
         }
 
         const patientId = req.user._id;
+        const patient = await userModel.findById(patientId).select("name");
 
         // Find Doctor
 
@@ -654,13 +655,17 @@ async function handleBookAppointment(req, res) {
 
             senderId: patientId,
 
+            referenceId: bookedAppointment._id,
+
+            referenceModel: "appointment",
+
             title: "New Appointment Request",
 
             message: "A patient has booked a new appointment.",
 
             type: "appointment",
 
-            referenceId: bookedAppointment._id
+            redirectUrl: `/doctor/appointments`
 
         });
 
@@ -678,29 +683,29 @@ async function handleBookAppointment(req, res) {
 
             isRead: notification.isRead,
 
-            createdAt: notification.createdAt
+            createdAt: notification.createdAt,
+
+            redirectUrl: notification.redirectUrl
 
         });
 
         return res.status(201).json({
 
             status: true,
-
-            message: "Appointment booked successfully.",
-
-            appointment: bookedAppointment
+            appointment: bookedAppointment,
+            message:`${patient.name} has booked a new appointment.`,
         });
 
-    }
+}
     catch (err) {
 
-        return res.status(500).json({
+    return res.status(500).json({
 
-            status: false,
+        status: false,
 
-            message: err.message
-        });
-    }
+        message: err.message
+    });
+}
 }
 
 async function allappointments(req, res) {

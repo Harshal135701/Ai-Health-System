@@ -91,7 +91,7 @@ async function login(req, res) {
             return res.redirect('/doctor/dashboard');
         }
         return res.redirect("/patient/dashboard");
-        
+
     }
     catch (err) {
         return res.status(500).json({
@@ -119,6 +119,21 @@ async function registrationPage(req, res) {
     }
 }
 
+async function logout(req, res) {
+    try {
+        // 1. Clear the cookie
+        res.clearCookie("token");
+        
+        // 2. Send a response to the client to confirm success
+        return res.redirect("/login")
+    }
+    catch (err) {
+        // 3. Handle errors
+        console.error("Logout error:", err); // Always good to log the error for debugging
+        return res.status(500).send("Something went wrong");
+    }
+}
+
 module.exports = {
-    registration, login, loginPage, registrationPage
+    registration, login, loginPage, registrationPage,logout
 }

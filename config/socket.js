@@ -8,7 +8,7 @@ function initializeSocket(server) {
 
     io.on("connection", (socket) => {
 
-        console.log(" User Connected :", socket.id);
+        // console.log(" User Connected :", socket.id);
 
         // Join Room
         socket.on("joinRoom", ({ userId, role }) => {
