@@ -1065,8 +1065,99 @@ async function updatePatientProfileGet(req, res) {
     }
 }
 
+async function handleGetPatientNotifications(req, res) {
+
+    try {
+
+        const notifications = await notificationModel
+            .find({
+                receiverId: req.user._id
+            })
+            .populate("senderId", "name profilePic")
+            .sort({
+                createdAt: -1
+            });
+
+        return res.status(200).json({
+
+            status: true,
+
+            notifications
+
+        });
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+
+            status: false,
+
+            message: err.message
+
+        });
+
+    }
+
+}
+
+async function handleMarkPatientNotificationRead(req, res) {
+
+    try {
+
+        const notificationId = req.params.notificationId;
+
+        const notification = await notificationModel.findOne({
+
+            _id: notificationId,
+
+            receiverId: req.user._id
+
+        });
+
+        if (!notification) {
+
+            return res.status(404).json({
+
+                status: false,
+
+                message: "Notification not found."
+
+            });
+
+        }
+
+        notification.isRead = true;
+
+        await notification.save();
+
+        return res.status(200).json({
+
+            status: true,
+
+            message: "Notification marked as read."
+
+        });
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+
+            status: false,
+
+            message: err.message
+
+        });
+
+    }
+
+}
+
 module.exports = {
     completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
     , handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost,
-    patientProfileGet, updatePatientProfileGet,
+    patientProfileGet, updatePatientProfileGet,handleGetPatientNotifications,
+    handleMarkPatientNotificationRead
+
 }

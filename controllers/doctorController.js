@@ -3,6 +3,7 @@ const userModel = require("../models/user")
 const appointmentModel = require("../models/appointment")
 const sendStatusEmail = require("../services/mailService")
 const notificationModel = require("../models/notification")
+const { getIO } = require("../config/socket")
 
 const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
 //  It just makes sure the string is a properly formatted 24-hour time
@@ -586,6 +587,72 @@ async function changeStatus(req, res) {
 
         await appointment.save();
 
+        // ===============================
+        // Create Notification For Patient
+        // ===============================
+
+        let title = "";
+        let message = "";
+        let type = "";
+
+        switch (appointmentStatus) {
+
+            case "confirmed":
+                title = "Appointment Confirmed";
+                message = `Dr. ${req.user.name} confirmed your appointment.`;
+                type = "appointment_confirmed";
+                break;
+
+            case "rejected":
+                title = "Appointment Rejected";
+                message = `Dr. ${req.user.name} rejected your appointment.`;
+                type = "appointment_rejected";
+                break;
+
+            case "completed":
+                title = "Appointment Completed";
+                message = `Your appointment with Dr. ${req.user.name} has been completed.`;
+                type = "appointment_completed";
+                break;
+
+        }
+
+        const notification = await notificationModel.create({
+
+            receiverId: appointment.patientId._id,
+
+            senderId: doctorUserId,
+
+            referenceId: appointment._id,
+
+            title,
+
+            message,
+
+            type
+
+        });
+
+        const io = getIO();
+
+        io.to(`patient_${appointment.patientId._id}`).emit("newNotification", {
+
+            _id: notification._id,
+
+            title: notification.title,
+
+            message: notification.message,
+
+            type: notification.type,
+
+            isRead: notification.isRead,
+
+            createdAt: notification.createdAt,
+
+            redirectUrl: "/patient/appointments"
+
+        });
+
         return res.status(200).json({
             status: true,
             message: "Appointment status updated successfully."
@@ -629,7 +696,7 @@ async function handleMarkNotificationAsRead(req, res) {
 
     try {
 
-        const { notificationId } = req.params;
+        const { id } = req.params;
 
         const notification =
             await notificationModel.findOneAndUpdate(
@@ -716,6 +783,6 @@ async function handleNotificationPage(req, res) {
 
 module.exports = {
     completeProfile, updateProfile, dashboardPage, completeProfileGet, getProfileForUpdate,
-    allAppointments, changeStatus, handleGetNotifications,handleMarkNotificationAsRead,
+    allAppointments, changeStatus, handleGetNotifications, handleMarkNotificationAsRead,
     handleNotificationPage
 }

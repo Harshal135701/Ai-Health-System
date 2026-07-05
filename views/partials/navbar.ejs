@@ -1,35 +1,36 @@
+<script>
+    window.notificationConfig = {
+        baseUrl: "/patient/notifications"
+    };
+</script>
+
 <nav class="navbar">
 
+    <!-- Left Section -->
     <div class="navbar-left">
 
-        <div class="search-box">
+        <form action="/patient/alldoctors" method="GET" class="search-box">
 
             <i class="fa-solid fa-magnifying-glass"></i>
 
-            <form action="/patient/alldoctors" method="GET" class="search-box">
+            <input type="text" name="doctorName" placeholder="Search doctors..."
+                value="<%= typeof filters !== 'undefined' ? (filters.doctorName || '') : '' %>">
 
-                <i class="fa-solid fa-magnifying-glass"></i>
-
-                <input type="text" name="doctorName" placeholder="Search doctors..."
-                    value="<%= typeof filters !== 'undefined' ? (filters.doctorName || '') : '' %>">
-
-            </form>
-
-        </div>
+        </form>
 
     </div>
 
+    <!-- Right Section -->
     <div class="navbar-right">
 
         <!-- Notification -->
-
         <div class="notification">
 
             <button class="notification-btn">
 
                 <i class="fa-solid fa-bell"></i>
 
-                <span class="badge">3</span>
+                <span class="badge" id="notificationBadge">0</span>
 
             </button>
 
@@ -43,63 +44,23 @@
 
                 </div>
 
-                <div class="notification-list">
-
-                    <div class="notification-item unread">
-
-                        <div class="notification-icon success">
-
-                            <i class="fa-solid fa-circle-check"></i>
-
-                        </div>
-
-                        <div class="notification-content">
-
-                            <h4>Appointment Confirmed</h4>
-
-                            <p>Dr. Rahul Sharma has confirmed your appointment.</p>
-
-                            <span>2 min ago</span>
-
-                        </div>
-
-                    </div>
-
-                    <div class="notification-item unread">
-
-                        <div class="notification-icon warning">
-
-                            <i class="fa-solid fa-calendar-days"></i>
-
-                        </div>
-
-                        <div class="notification-content">
-
-                            <h4>Appointment Tomorrow</h4>
-
-                            <p>Your appointment is scheduled for tomorrow at 10:00 AM.</p>
-
-                            <span>1 hour ago</span>
-
-                        </div>
-
-                    </div>
+                <div class="notification-list" id="notificationList">
 
                     <div class="notification-item">
 
-                        <div class="notification-icon danger">
+                        <div class="notification-icon success">
 
-                            <i class="fa-solid fa-circle-xmark"></i>
+                            <i class="fa-solid fa-bell"></i>
 
                         </div>
 
                         <div class="notification-content">
 
-                            <h4>Appointment Rejected</h4>
+                            <h4>No Notifications</h4>
 
-                            <p>Dr. Amit rejected your appointment request.</p>
+                            <p>You don't have any notifications yet.</p>
 
-                            <span>Yesterday</span>
+                            <span>Just Now</span>
 
                         </div>
 
@@ -112,7 +73,6 @@
         </div>
 
         <!-- User -->
-
         <div class="user-info">
 
             <img src="<%= user.profilePic %>" alt="Profile">
@@ -131,40 +91,21 @@
 
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-
-    <script>
-
-        const socket = io();
-
-        socket.on("connect", () => {
-
-            console.log("Connected");
-
-            socket.emit("joinRoom", {
-
-                userId: "<%= user._id %>",
-
-                role: "<%= user.role %>"
-
-            });
-
-        });
-
-        socket.on("roomJoined", (data) => {
-
-            console.log(data.message);
-
-        });
-
-        socket.on("newNotification", (notification) => {
-
-            console.log(notification);
-
-        });
-
-
-
-    </script>
-
 </nav>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    window.notificationConfig = {
+        baseUrl: "/patient/notifications",
+        defaultRedirect: "/patient/appointments"
+    };
+
+    window.currentUser = {
+        id: "<%= user._id %>",
+        role: "<%= user.role %>"
+    };
+</script>
+
+<script src="/js/notification.js"></script>
+<script src="/js/patientNavbar.js"></script>

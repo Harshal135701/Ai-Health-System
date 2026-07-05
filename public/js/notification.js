@@ -3,8 +3,13 @@ const notificationDropdown = document.querySelector(".notification-dropdown");
 const notificationList = document.getElementById("notificationList");
 const badge = document.getElementById("notificationBadge");
 
+// ===============================
+// Render Notification
+// ===============================
+
 function renderNotification(notification) {
 
+    // Remove "No Notifications"
     if (
         notificationList.children.length === 1 &&
         notificationList.children[0].querySelector("h4") &&
@@ -18,8 +23,10 @@ function renderNotification(notification) {
     notificationItem.className = "notification-item";
 
     notificationItem.dataset.id = notification._id;
+
     notificationItem.dataset.url =
-        notification.redirectUrl || "/doctor/appointments";
+        notification.redirectUrl ||
+        window.notificationConfig.defaultRedirect;
 
     if (!notification.isRead) {
         notificationItem.classList.add("unread");
@@ -41,11 +48,15 @@ function renderNotification(notification) {
 
 }
 
+// ===============================
+// Load Notifications
+// ===============================
+
 async function loadNotifications() {
 
     try {
 
-        const response = await fetch("/doctor/notifications");
+        const response = await fetch(window.notificationConfig.baseUrl);
 
         const data = await response.json();
 
@@ -77,19 +88,28 @@ async function loadNotifications() {
 
         }
 
-        badge.innerText =
-            data.notifications.filter(n => !n.isRead).length;
+        const unreadCount = data.notifications.filter(
+            notification => !notification.isRead
+        ).length;
+
+        badge.innerText = unreadCount;
 
         data.notifications.forEach(renderNotification);
 
     }
-    catch(err){
+    catch (err) {
+
         console.error(err);
+
     }
 
 }
 
-notificationBtn.addEventListener("click",(e)=>{
+// ===============================
+// Dropdown Open / Close
+// ===============================
+
+notificationBtn.addEventListener("click", (e) => {
 
     e.stopPropagation();
 
@@ -97,59 +117,112 @@ notificationBtn.addEventListener("click",(e)=>{
 
 });
 
-notificationDropdown.addEventListener("click",(e)=>{
+notificationDropdown.addEventListener("click", (e) => {
 
     e.stopPropagation();
 
 });
 
-document.addEventListener("click",()=>{
+document.addEventListener("click", () => {
 
     notificationDropdown.classList.remove("show");
 
 });
 
-notificationList.addEventListener("click",async(e)=>{
+// ===============================
+// Click Notification
+// ===============================
 
-    const notificationItem =
-        e.target.closest(".notification-item");
+notificationList.addEventListener("click", async (e) => {
 
-    if(!notificationItem) return;
+    const notificationItem = e.target.closest(".notification-item");
 
-    if(!notificationItem.dataset.id) return;
+    if (!notificationItem) return;
 
-    try{
+    if (!notificationItem.dataset.id) return;
 
-        if(notificationItem.classList.contains("unread")){
+    const notificationId = notificationItem.dataset.id;
+    const redirectUrl = notificationItem.dataset.url;
+
+    console.log("Clicked Notification");
+    console.log("Notification ID:", notificationId);
+    console.log("Redirect URL:", redirectUrl);
+
+    try {
+
+        // Mark as Read
+        if (notificationItem.classList.contains("unread")) {
 
             const response = await fetch(
-                `/doctor/notifications/${notificationItem.dataset.id}/read`,
+
+                `${window.notificationConfig.baseUrl}/${notificationId}/read`,
+
                 {
-                    method:"PATCH"
+                    method: "PATCH"
                 }
+
             );
 
             const data = await response.json();
 
-            if(!data.status) return;
+            if (!data.status) return;
 
             notificationItem.classList.remove("unread");
 
-            badge.innerText =
-                Math.max(0,Number(badge.innerText)-1);
+            badge.innerText = Math.max(
+                0,
+                Number(badge.innerText) - 1
+            );
 
         }
 
+        // Close Dropdown
         notificationDropdown.classList.remove("show");
 
-        window.location.href =
-            notificationItem.dataset.url;
+        // Redirect
+        window.location.href = redirectUrl;
 
     }
-    catch(err){
+    catch (err) {
 
         console.error(err);
 
     }
+
+});
+
+// ===============================
+// Socket Events
+// ===============================
+
+socket.on("connect", () => {
+
+    console.log("Socket Connected");
+
+    socket.emit("joinRoom", {
+
+        userId: window.currentUser.id,
+
+        role: window.currentUser.role
+
+    });
+
+    loadNotifications();
+
+});
+
+socket.on("roomJoined", (data) => {
+
+    console.log(data.message);
+
+});
+
+socket.on("newNotification", (notification) => {
+
+    console.log(notification);
+
+    badge.innerText = Number(badge.innerText) + 1;
+
+    renderNotification(notification);
 
 });

@@ -1,3 +1,9 @@
+<script>
+    window.notificationConfig = {
+        baseUrl: "/doctor/notifications"
+    };
+</script>
+
 <nav class="navbar">
 
     <!-- Left Section -->
@@ -95,6 +101,11 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
+    window.notificationConfig = {
+        baseUrl: "/doctor/notifications",
+        defaultRedirect: "/doctor/appointments"
+    };
+
     window.currentUser = {
         id: "<%= user._id %>",
         role: "<%= user.role %>"
