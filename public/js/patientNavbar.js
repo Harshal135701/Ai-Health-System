@@ -2,8 +2,6 @@ const socket = io();
 
 socket.on("connect", () => {
 
-    console.log("Socket Connected");
-
     socket.emit("joinRoom", {
 
         userId: window.currentUser.id,

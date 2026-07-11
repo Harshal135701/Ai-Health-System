@@ -144,10 +144,6 @@ notificationList.addEventListener("click", async (e) => {
     const notificationId = notificationItem.dataset.id;
     const redirectUrl = notificationItem.dataset.url;
 
-    console.log("Clicked Notification");
-    console.log("Notification ID:", notificationId);
-    console.log("Redirect URL:", redirectUrl);
-
     try {
 
         // Mark as Read
@@ -195,34 +191,31 @@ notificationList.addEventListener("click", async (e) => {
 // Socket Events
 // ===============================
 
-socket.on("connect", () => {
+// socket.on("connect", () => {
 
-    console.log("Socket Connected");
 
-    socket.emit("joinRoom", {
+//     socket.emit("joinRoom", {
 
-        userId: window.currentUser.id,
+//         userId: window.currentUser.id,
 
-        role: window.currentUser.role
+//         role: window.currentUser.role
 
-    });
+//     });
 
-    loadNotifications();
+//     loadNotifications();
 
-});
+// });
 
-socket.on("roomJoined", (data) => {
+// socket.on("roomJoined", (data) => {
 
-    console.log(data.message);
+//     console.log(data.message);
 
-});
+// });
 
-socket.on("newNotification", (notification) => {
+// socket.on("newNotification", (notification) => {
 
-    console.log(notification);
+//     badge.innerText = Number(badge.innerText) + 1;
 
-    badge.innerText = Number(badge.innerText) + 1;
+//     renderNotification(notification);
 
-    renderNotification(notification);
-
-});
+// });

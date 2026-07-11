@@ -1,8 +1,8 @@
 const express = require("express")
 const router = express.Router();
 const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost, patientProfileGet, updatePatientProfileGet,
-    handleGetPatientNotifications,handleMarkPatientNotificationRead
- } = require("../controllers/patientController")
+    handleGetPatientNotifications, handleMarkPatientNotificationRead
+} = require("../controllers/patientController")
 const { authMiddleware } = require("../middlewares/auth")
 const { roleMiddleware } = require("../middlewares/roleMiddleware");
 const { profileCompleted } = require("../middlewares/profileCompleted")
@@ -17,12 +17,8 @@ router.get("/doctors/:DoctorUserId", authMiddleware, roleMiddleware("patient"), 
 router.get("/:DoctorUserId/appointment/booking", authMiddleware, roleMiddleware("patient"), bookAppointment)
 router.get("/appointments/:appointmentId/edit", authMiddleware, roleMiddleware("patient"), editAppointment)
 router.get("/appointments", authMiddleware, roleMiddleware("patient"), allappointments)
-router.get(
-    "/notifications",
-    authMiddleware,
-    roleMiddleware("patient"),
-    handleGetPatientNotifications
-);
+router.get("/notifications", authMiddleware, roleMiddleware("patient"), handleGetPatientNotifications);
+
 
 // POST ROUTES
 router.post("/profile", authMiddleware, roleMiddleware("patient"), upload.single("profileImage"), completeProfile);
@@ -37,12 +33,7 @@ router.put("/appointments/:appointmentId/edit", authMiddleware, roleMiddleware("
 // DELETE ROUTES
 router.delete("/appointments/:appointmentId", authMiddleware, roleMiddleware("patient"), cancelAppointment)
 
-router.patch(
-    "/notifications/:notificationId/read",
-    authMiddleware,
-    roleMiddleware("patient"),
-    handleMarkPatientNotificationRead
-);
 
+router.patch("/notifications/:notificationId/read", authMiddleware, roleMiddleware("patient"), handleMarkPatientNotificationRead);
 
 module.exports = router;
