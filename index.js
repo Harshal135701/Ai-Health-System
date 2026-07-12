@@ -19,6 +19,8 @@ port = process.env.PORT || 5000;
 const authRoutes = require("./routes/authRoute")
 const doctorRoute = require("./routes/doctorRoute")
 const patientRoute = require("./routes/patientRoute")
+const conversationRoute = require("./routes/conversationRoute");
+const chatRoute = require("./routes/chatRoute");
 
 app.get("/", (req, res) => {
     res.send("Server Running");
@@ -33,6 +35,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", authRoutes);
 app.use("/doctor", doctorRoute);
 app.use("/patient", patientRoute);
+app.use("/api/conversation", conversationRoute);
+app.use("/chat", chatRoute);
 app.use(express.static(path.join(__dirname, "public")));
 
 initializeSocket(server)

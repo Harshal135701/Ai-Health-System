@@ -69,11 +69,24 @@
                         Cancel Appointment
                     </button>
                     <a href="/patient/appointments/<%=appointment._id%>/edit">Edit Appointment</a>
-                    <% }) %>
+                    <% if(["confirmed","completed"].includes(appointment.appointmentStatus)){ %>
 
+                        <form action="/chat/start" method="POST" style="display:inline;">
+
+                            <input type="hidden" name="receiverId" value="<%= appointment.doctorId.userId._id %>">
+
+                            <button type="submit">
+                                Open Chat
+                            </button>
+
+                        </form>
 
                         <% } %>
-                            <script src="/js/cancelAppointment.js"></script>
+                            <% }) %>
+
+
+                                <% } %>
+                                    <script src="/js/cancelAppointment.js"></script>
 </body>
 
 </html>

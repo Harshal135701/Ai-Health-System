@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chat</title>
+</head>
+
+<body>
+
+    <h2>Chat</h2>
+
+    <div id="messages">
+
+        <% messages.forEach(message=>{ %>
+
+            <p>
+
+                <strong>
+                    <%= message.sender.name %>
+                </strong>
+
+                :
+
+                <%= message.text %>
+
+            </p>
+
+            <% }) %>
+
+    </div>
+
+    <hr>
+
+    <input type="text" id="messageInput" placeholder="Type message">
+
+    <button id="sendBtn">
+
+        Send
+
+    </button>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+
+        socket.emit("joinRoom", {
+            userId: "<%= user._id %>",
+            role: "<%= user.role %>"
+        });
+
+        socket.emit("joinConversation", {
+            conversationId: "<%= conversation._id %>"
+        });
+
+        const sendBtn = document.getElementById("sendBtn");
+        const messageInput = document.getElementById("messageInput");
+
+        sendBtn.addEventListener("click", () => {
+
+            const text = messageInput.value.trim();
+
+            if (!text) return;
+
+            socket.emit("sendMessage", {
+
+                conversationId: "<%= conversation._id %>",
+                sender: "<%= user._id %>",
+                text
+
+            });
+
+            messageInput.value = "";
+
+        });
+
+        const messagesDiv = document.getElementById("messages");
+
+        socket.on("receiveMessage", (message) => {
+
+            const p = document.createElement("p");
+
+            p.innerHTML = `<strong>${message.sender.name}</strong> : ${message.text}`;
+
+            messagesDiv.appendChild(p);
+
+        });
+    </script>
+</body>
+
+</html>

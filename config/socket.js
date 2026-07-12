@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+const Message = require("../models/message");
 
 let io;
 
@@ -7,10 +8,6 @@ function initializeSocket(server) {
     io = new Server(server);
 
     io.on("connection", (socket) => {
-
-        // console.log(" User Connected :", socket.id);
-
-        // Join Room
         socket.on("joinRoom", ({ userId, role }) => {
 
             const roomName = `${role}_${userId}`;
@@ -25,9 +22,43 @@ function initializeSocket(server) {
             });
         });
 
-        socket.on("disconnect", () => {
+        socket.on("joinConversation", ({ conversationId }) => {
 
-            // console.log("❌ User Disconnected :", socket.id);
+            const roomName = `conversation_${conversationId}`;
+
+            socket.join(roomName);
+
+            console.log(`${socket.id} joined ${roomName}`);
+
+        });
+
+        socket.on("sendMessage", async (data) => {
+            try {
+
+                const {
+                    conversationId,
+                    sender,
+                    text
+                } = data;
+
+                const message = await Message.create({
+                    conversationId,
+                    sender,
+                    text
+                });
+
+                const populatedMessage = await Message.findById(message._id)
+                    .populate("sender", "name role profilePic");
+
+                io.to(`conversation_${conversationId}`)
+                    .emit("receiveMessage", populatedMessage);
+
+            } catch (err) {
+                console.log(err);
+            }
+        });
+
+        socket.on("disconnect", () => {
 
         });
 
