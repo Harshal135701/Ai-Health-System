@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Review</title>
+</head>
+
+<body>
+
+    <h2>Doctor Review</h2>
+
+    <hr>
+
+    <h3>
+        Doctor :
+        <%= appointment.doctorId.userId.name %>
+    </h3>
+
+    <p>
+        <strong>Status :</strong>
+        <%= appointment.appointmentStatus %>
+    </p>
+
+    <hr>
+
+    <% if(appointment.appointmentStatus !== "completed"){ %>
+
+        <h3>
+            You can submit a review only after the appointment is completed.
+        </h3>
+
+    <% } else if(review){ %>
+
+        <h3>Your Review</h3>
+
+        <p>
+            <strong>Rating :</strong>
+            ⭐ <%= review.rating %> / 5
+        </p>
+
+        <p>
+            <strong>Comment :</strong>
+            <%= review.comment || "No comment provided." %>
+        </p>
+
+    <% } else { %>
+
+        <form action="/patient/review/<%= appointment._id %>" method="POST">
+
+            <label>Rating</label>
+            <br>
+
+            <select name="rating" required>
+
+                <option value="">Select Rating</option>
+                <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                <option value="4">⭐⭐⭐⭐ (4)</option>
+                <option value="3">⭐⭐⭐ (3)</option>
+                <option value="2">⭐⭐ (2)</option>
+                <option value="1">⭐ (1)</option>
+
+            </select>
+
+            <br><br>
+
+            <label>Comment</label>
+            <br>
+
+            <textarea
+                name="comment"
+                rows="5"
+                cols="40"
+                placeholder="Share your experience..."></textarea>
+
+            <br><br>
+
+            <button type="submit">
+                Submit Review
+            </button>
+
+        </form>
+
+    <% } %>
+
+</body>
+
+</html>

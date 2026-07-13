@@ -33,8 +33,51 @@
         rating-
         <%=doctor.rating%>
     </li>
-<br><br>
-   <a href="/patient/<%=doctor.userId._id%>/appointment/booking">Book Appointment</a>
+    <li>
+        Total Reviews -
+        <%= doctor.totalReviews %>
+    </li>
+
+    <br>
+
+    <h3>Patient Reviews</h3>
+
+    <% if(reviews.length===0){ %>
+
+        <p>No reviews yet.</p>
+
+        <% } else { %>
+
+            <% reviews.forEach(function(review){ %>
+
+                <hr>
+
+                <h4>
+                    <%= review.patientId.name %>
+                </h4>
+
+                <p>
+                    Rating :
+                    ⭐ <%= review.rating %> / 5
+                </p>
+
+                <p>
+                    <%= review.comment || "No comment provided." %>
+                </p>
+
+                <small>
+                    <%= review.createdAt.toLocaleDateString("en-IN") %>
+                </small>
+
+                <% }) %>
+
+                    <% } %>
+
+                        <br>
+
+                        <a href="/patient/<%=doctor.userId._id%>/appointment/booking">
+                            Book Appointment
+                        </a>
 </body>
 
 </html>

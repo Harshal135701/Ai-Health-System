@@ -3,6 +3,7 @@ const patientProfile = require("../models/patientProfile")
 const doctorProfile = require("../models/doctorProfile")
 const appointmentModel = require("../models/appointment")
 const notificationModel = require("../models/notification")
+const reviewModel = require("../models/review");
 const { getIO } = require("../config/socket")
 
 
@@ -416,23 +417,40 @@ async function Alldoctors(req, res) {
 
     }
 }
-
 async function completeDoctorInfo(req, res) {
     try {
+
         const id = req.params.DoctorUserId;
-        const doctor = await doctorProfile.findOne({
-            userId: id
-        }).populate("userId")
+
+        const doctor = await doctorProfile
+            .findOne({
+                userId: id
+            })
+            .populate("userId");
 
         if (!doctor) {
             return res.status(404).redirect("/patient/Alldoctors");
         }
+
+        // Fetch all reviews of this doctor
+        const reviews = await reviewModel
+            .find({
+                doctorId: doctor._id
+            })
+            .populate("patientId", "name profilePic")
+            .sort({ createdAt: -1 }).limit(5);
+            
+
         return res.status(200).render("patient/doctorProfile", {
-            doctor
-        })
+            doctor,
+            reviews
+        });
+
     }
     catch (err) {
+
         return res.status(404).redirect("/patient/Alldoctors");
+
     }
 }
 
@@ -693,19 +711,19 @@ async function handleBookAppointment(req, res) {
 
             status: true,
             appointment: bookedAppointment,
-            message:`${patient.name} has booked a new appointment.`,
+            message: `${patient.name} has booked a new appointment.`,
         });
 
-}
+    }
     catch (err) {
 
-    return res.status(500).json({
+        return res.status(500).json({
 
-        status: false,
+            status: false,
 
-        message: err.message
-    });
-}
+            message: err.message
+        });
+    }
 }
 
 async function allappointments(req, res) {
@@ -718,9 +736,6 @@ async function allappointments(req, res) {
                 patientId: user._id
             })
             .populate({
-                // We are using nested populate 
-                // because in doctorId only access doctor profile 
-                // but to access user model we need this
                 path: "doctorId",
                 populate: {
                     path: "userId"
@@ -728,10 +743,22 @@ async function allappointments(req, res) {
             })
             .sort({ appointmentDate: -1 });
 
+        // Fetch all reviews given by this patient
+        const reviews = await reviewModel.find({
+            patientId: user._id
+        });
+
+        // Create a map for quick lookup
+        const reviewMap = {};
+
+        reviews.forEach(review => {
+            reviewMap[review.appointmentId.toString()] = review;
+        });
 
         return res.status(200).render("patient/appointments", {
             status: true,
             appointments: allappointments,
+            reviewMap,
             activePage: "appointments",
             user
         });
@@ -1154,10 +1181,141 @@ async function handleMarkPatientNotificationRead(req, res) {
 
 }
 
+async function reviewPage(req, res) {
+
+    try {
+
+        const user = req.user;
+        const { appointmentId } = req.params;
+
+        // Find appointment
+        const appointment = await appointmentModel
+            .findById(appointmentId)
+            .populate({
+                path: "doctorId",
+                populate: {
+                    path: "userId"
+                }
+            });
+
+        if (!appointment) {
+            return res.status(404).send("Appointment not found.");
+        }
+
+        // Security check
+        if (appointment.patientId.toString() !== user._id.toString()) {
+            return res.status(403).send("Unauthorized.");
+        }
+
+        // Find existing review (if any)
+        const review = await reviewModel.findOne({
+            appointmentId
+        });
+
+        return res.render("patient/review", {
+            user,
+            appointment,
+            review
+        });
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+
+    }
+
+}
+
+async function submitReview(req, res) {
+
+    try {
+
+        const user = req.user;
+        const { appointmentId } = req.params;
+        const { rating, comment } = req.body;
+
+        // Find appointment
+        const appointment = await appointmentModel.findById(appointmentId);
+
+        if (!appointment) {
+            return res.status(404).send("Appointment not found.");
+        }
+
+        // Security check
+        if (appointment.patientId.toString() !== user._id.toString()) {
+            return res.status(403).send("Unauthorized.");
+        }
+
+        // Appointment must be completed
+        if (appointment.appointmentStatus !== "completed") {
+            return res.status(400).send("You can review only completed appointments.");
+        }
+
+        // Prevent duplicate reviews
+        const existingReview = await reviewModel.findOne({
+            appointmentId
+        });
+
+        if (existingReview) {
+            return res.status(400).send("You have already reviewed this appointment.");
+        }
+
+        // Create review
+        await reviewModel.create({
+
+            doctorId: appointment.doctorId,
+
+            patientId: user._id,
+
+            appointmentId,
+
+            rating,
+
+            comment
+
+        });
+
+        // Recalculate doctor's rating
+        const reviews = await reviewModel.find({
+            doctorId: appointment.doctorId
+        });
+
+        const totalRating = reviews.reduce((sum, review) => {
+            return sum + review.rating;
+        }, 0);
+
+        const averageRating = totalRating / reviews.length;
+
+        await doctorProfile.findByIdAndUpdate(
+            appointment.doctorId,
+            {
+                rating: averageRating,
+                totalReviews: reviews.length
+            }
+        );
+
+        return res.redirect("/patient/appointments");
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+
+    }
+
+}
+
 module.exports = {
     completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
     , handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost,
-    patientProfileGet, updatePatientProfileGet,handleGetPatientNotifications,
-    handleMarkPatientNotificationRead
+    patientProfileGet, updatePatientProfileGet, handleGetPatientNotifications,
+    handleMarkPatientNotificationRead, reviewPage, submitReview
 
 }

@@ -65,6 +65,16 @@
                         ₹<%= appointment.consultationFee %>
                     </p>
 
+                    <p>
+                        <strong>Ratings :</strong>
+                        <%= appointment.doctorId.rating  || "No rating yet"%>
+                    </p>
+
+                     <p>
+                        <strong>Total Reviews :</strong>
+                        <%= appointment.doctorId.totalReviews  || "No review yet"%>
+                    </p>
+
                     <button class="cancelBtn" data-appointment-id="<%= appointment._id %>">
                         Cancel Appointment
                     </button>
@@ -82,11 +92,24 @@
                         </form>
 
                         <% } %>
-                            <% }) %>
+                            <% if(reviewMap[appointment._id]){ %>
+
+                                <a href="/patient/review/<%= appointment._id %>" class="reviewBtn">
+                                    View Review
+                                </a>
+
+                                <% } else { %>
+
+                                    <a href="/patient/review/<%= appointment._id %>" class="reviewBtn">
+                                        Give Review
+                                    </a>
+
+                                    <% } %>
+                                        <% }) %>
 
 
-                                <% } %>
-                                    <script src="/js/cancelAppointment.js"></script>
+                                            <% } %>
+                                                <script src="/js/cancelAppointment.js"></script>
 </body>
 
 </html>

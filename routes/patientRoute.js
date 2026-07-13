@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost, patientProfileGet, updatePatientProfileGet,
-    handleGetPatientNotifications, handleMarkPatientNotificationRead
+    handleGetPatientNotifications, handleMarkPatientNotificationRead,reviewPage,submitReview
 } = require("../controllers/patientController")
 const { authMiddleware } = require("../middlewares/auth")
 const { roleMiddleware } = require("../middlewares/roleMiddleware");
@@ -18,11 +18,16 @@ router.get("/:DoctorUserId/appointment/booking", authMiddleware, roleMiddleware(
 router.get("/appointments/:appointmentId/edit", authMiddleware, roleMiddleware("patient"), editAppointment)
 router.get("/appointments", authMiddleware, roleMiddleware("patient"), allappointments)
 router.get("/notifications", authMiddleware, roleMiddleware("patient"), handleGetPatientNotifications);
+router.get( "/review/:appointmentId", authMiddleware, roleMiddleware("patient"), reviewPage);
+   
+
 
 
 // POST ROUTES
 router.post("/profile", authMiddleware, roleMiddleware("patient"), upload.single("profileImage"), completeProfile);
 router.post("/appointment/book/:DoctorUserId", authMiddleware, roleMiddleware("patient"), profileCompleted, handleBookAppointment);
+router.post("/review/:appointmentId",authMiddleware,roleMiddleware("patient"),submitReview);
+
 
 
 // PUT ROUTES

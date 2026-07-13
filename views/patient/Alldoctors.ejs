@@ -139,6 +139,11 @@
                         ₹<%= doctor.consultationFee %>
                     </p>
 
+                    <p>
+                        <strong>Rating :</strong>
+                        <%= doctor.rating || "No review Yet" %>
+                    </p>
+
                     <a href="/patient/doctors/<%= doctor.userId._id %>">
                         View Doctor
                     </a>
