@@ -4,6 +4,7 @@ const doctorProfile = require("../models/doctorProfile")
 const appointmentModel = require("../models/appointment")
 const notificationModel = require("../models/notification")
 const reviewModel = require("../models/review");
+const aiService = require("../services/aiService");
 const { getIO } = require("../config/socket")
 
 
@@ -439,7 +440,7 @@ async function completeDoctorInfo(req, res) {
             })
             .populate("patientId", "name profilePic")
             .sort({ createdAt: -1 }).limit(5);
-            
+
 
         return res.status(200).render("patient/doctorProfile", {
             doctor,
@@ -476,7 +477,7 @@ async function bookAppointment(req, res) {
 
 async function handleBookAppointment(req, res) {
     try {
-
+        console.log(req.body.paymentMethod);
         const {
             appointmentDate,
             startTime,
@@ -1312,10 +1313,69 @@ async function submitReview(req, res) {
 
 }
 
+async function aiSymptomCheckerPage(req, res) {
+
+    return res.render("patient/aiSymptomChecker");
+
+}
+
+
+async function analyzeSymptoms(req, res) {
+    try {
+
+        const user = req.user;
+        if (!req.body.symptoms || !req.body.duration || !req.body.painLevel) {
+            return res.status(400).json({
+                status: false,
+                message: "All fields are required."
+            });
+        }
+
+        // Fetch patient profile
+        const patientProfileIs = await patientProfile.findOne({
+            userId: user._id
+        });
+
+        if (!patientProfileIs) {
+            return res.status(404).json({
+                status: false,
+                message: "Please complete your patient profile first."
+            });
+        }
+
+        const symptomData = {
+            symptoms: req.body.symptoms,
+            duration: req.body.duration,
+            painLevel: req.body.painLevel
+        };
+
+        const result = await aiService.symptomChecker(
+            patientProfileIs,
+            symptomData
+        );
+
+        return res.status(200).json({
+            status: true,
+            data: result
+        });
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+
+    }
+}
+
+
 module.exports = {
     completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
     , handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost,
     patientProfileGet, updatePatientProfileGet, handleGetPatientNotifications,
-    handleMarkPatientNotificationRead, reviewPage, submitReview
+    handleMarkPatientNotificationRead, reviewPage, submitReview, aiSymptomCheckerPage,
+    analyzeSymptoms
 
 }

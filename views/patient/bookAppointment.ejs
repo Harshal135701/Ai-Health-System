@@ -44,9 +44,30 @@
         <textarea name="patientMessage" rows="4" cols="40" placeholder="Additional information" required></textarea>
         <br><br>
 
+        <!-- Payment Section Starts Here -->
+
+        <h3>Payment Method</h3>
+
+        <label>
+            <input type="radio" name="paymentMethod" value="online" required>
+
+            Pay Online
+        </label>
+
+        <br>
+
+        <label>
+            <input type="radio" name="paymentMethod" value="hospital" checked>
+
+            Pay at Hospital
+        </label>
+
+        <br><br>
+
         <button type="submit">
             Book Appointment
         </button>
+
     </form>
 
     <script src="/js/bookAppointment.js"></script>

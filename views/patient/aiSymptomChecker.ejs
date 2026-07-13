@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Symptom Checker</title>
+</head>
+
+<body>
+
+    <h2>AI Symptom Checker</h2>
+
+    <form id="aiSymptomCheckerForm">
+
+        <label>Describe Your Symptoms</label>
+        <br>
+
+        <textarea
+            name="symptoms"
+            rows="5"
+            cols="50"
+            placeholder="Example: Fever, headache, body pain..."
+            required></textarea>
+
+        <br><br>
+
+        <label>Duration</label>
+        <br>
+
+        <input
+            type="text"
+            name="duration"
+            placeholder="Example: 3 days"
+            required>
+
+        <br><br>
+
+        <label>Pain Level</label>
+        <br>
+
+        <input
+            type="range"
+            name="painLevel"
+            min="1"
+            max="10"
+            value="5"
+            oninput="painValue.innerText=this.value">
+
+        <span id="painValue">5</span>/10
+
+        <br><br>
+
+        <button type="submit">
+
+            Analyze Symptoms
+
+        </button>
+
+    </form>
+
+    <script src="/js/aiSymptomChecker.js"></script>
+
+</body>
+
+</html>

@@ -17,7 +17,8 @@ form.addEventListener("submit", async (e) => {
             startTime: form.startTime.value,
             endTime: form.endTime.value,
             symptoms: form.symptoms.value,
-            patientMessage: form.patientMessage.value
+            patientMessage: form.patientMessage.value,
+            paymentMethod: form.paymentMethod.value
         };
 
         const response = await fetch(`/patient/appointment/book/${doctorId}`, {
