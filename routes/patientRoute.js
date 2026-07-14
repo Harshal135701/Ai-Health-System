@@ -9,6 +9,7 @@ const { roleMiddleware } = require("../middlewares/roleMiddleware");
 const { profileCompleted } = require("../middlewares/profileCompleted")
 const { aiRateLimiter } = require("../middlewares/rateLimiter")
 const upload = require("../middlewares/multer")
+// const redisClient = require("../config/redis");
 
 // GET ROUTES
 router.get("/dashboard", authMiddleware, dashboardPage);
@@ -30,9 +31,6 @@ router.post("/profile", authMiddleware, roleMiddleware("patient"), upload.single
 router.post("/appointment/book/:DoctorUserId", authMiddleware, roleMiddleware("patient"), profileCompleted, handleBookAppointment);
 router.post("/review/:appointmentId", authMiddleware, roleMiddleware("patient"), submitReview);
 router.post("/ai-symptom-checker", aiRateLimiter,authMiddleware, roleMiddleware("patient"), analyzeSymptoms);
-
-
-
 
 
 // PUT ROUTES

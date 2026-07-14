@@ -5,6 +5,8 @@ const appointmentModel = require("../models/appointment")
 const notificationModel = require("../models/notification")
 const reviewModel = require("../models/review");
 const aiService = require("../services/aiService");
+const redisClient = require("../config/redis");
+const { getCache, setCache } = require("../services/cacheServices")
 const { getIO } = require("../config/socket")
 
 
@@ -1349,10 +1351,37 @@ async function analyzeSymptoms(req, res) {
             painLevel: req.body.painLevel
         };
 
+        const normalizedSymptoms = req.body.symptoms
+            .toLowerCase()
+            .split(",")
+            .map(symptom => symptom.trim())
+            .sort()
+            .join(",");
+
+        const cacheKey = `ai:${normalizedSymptoms}:${req.body.duration}:${req.body.painLevel}`;
+
+        const cachedResult = await getCache(cacheKey)
+
+        if (cachedResult) {
+
+            console.log("Response comes from redis");
+
+            return res.status(200).json({
+                status: true,
+                source: "redis",
+                data: cachedResult
+            });
+
+        }
+
+        console.log("Response comes from gemini");
+
         const result = await aiService.symptomChecker(
             patientProfileIs,
             symptomData
         );
+
+        await setCache(cacheKey, result)
 
         return res.status(200).json({
             status: true,

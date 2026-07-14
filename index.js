@@ -4,6 +4,7 @@ const app = express()
 
 const connectDb = require('./config/db')
 connectDb()
+const redisClient = require("./config/redis");
 
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -40,7 +41,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 initializeSocket(server)
 
-server.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+server.listen(port, async () => {
+    try {
+        await redisClient.connect();
 
+        console.log("✅ Redis Connected");
+        console.log(`Listening on port ${port}`);
+
+    } catch (err) {
+        console.log("Redis Connection Failed:", err);
+    }
 });
