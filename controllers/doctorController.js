@@ -1,7 +1,7 @@
 const doctorProfileModel = require("../models/doctorProfile")
 const userModel = require("../models/user")
 const appointmentModel = require("../models/appointment")
-const sendStatusEmail = require("../services/mailService")
+const { sendStatusEmail } = require("../services/mailService")
 const notificationModel = require("../models/notification")
 const { getIO } = require("../config/socket")
 
@@ -696,7 +696,7 @@ async function handleMarkNotificationAsRead(req, res) {
 
     try {
 
-        const { id } = req.params;
+        const { notificationId } = req.params;
 
         const notification =
             await notificationModel.findOneAndUpdate(

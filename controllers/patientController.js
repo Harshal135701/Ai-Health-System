@@ -7,7 +7,8 @@ const reviewModel = require("../models/review");
 const aiService = require("../services/aiService");
 const redisClient = require("../config/redis");
 const { getCache, setCache } = require("../services/cacheServices")
-const { getIO } = require("../config/socket")
+const sendNotification = require("../utils/sendNotification");
+const { sendBookingConfirmationEmail } = require("../services/mailService");
 
 
 function formatTime(minutes) {
@@ -504,13 +505,13 @@ async function handleBookAppointment(req, res) {
         }
 
         const patientId = req.user._id;
-        const patient = await userModel.findById(patientId).select("name");
+        const patient = await userModel.findById(patientId).select("name email");
 
         // Find Doctor
 
         const doctorId = req.params.DoctorUserId;
 
-        const doctor = await doctorProfile.findById(doctorId);
+        const doctor = await doctorProfile.findById(doctorId).populate("userId", "name email");
 
         if (!doctor) {
             return res.status(404).json({
@@ -669,46 +670,36 @@ async function handleBookAppointment(req, res) {
                 consultationFee: doctor.consultationFee
             });
 
-
-        const notification = await notificationModel.create({
-
-            receiverId: doctor.userId,
-
+        await sendNotification({
+            receiverId: doctor.userId._id,
             senderId: patientId,
-
             referenceId: bookedAppointment._id,
-
             referenceModel: "appointment",
-
             title: "New Appointment Request",
-
             message: "A patient has booked a new appointment.",
-
             type: "appointment",
-
-            redirectUrl: `/doctor/appointments`
-
+            redirectUrl: "/doctor/appointments",
+            roomName: `doctor_${doctor.userId._id}`
         });
 
-        const io = getIO();
+        // Send Booking Confirmation Email To Patient
+        try {
 
-        io.to(`doctor_${doctor.userId}`).emit("newNotification", {
+            await sendBookingConfirmationEmail(
+                patient.email,
+                patient.name,
+                doctor.userId.name,
+                requestedDate.toLocaleDateString("en-IN"),
+                formatTime(appointmentStartTime),
+                formatTime(appointmentEndTime)
+            );
 
-            _id: notification._id,
+        } catch (mailErr) {
 
-            title: notification.title,
+            // Don't fail the booking just because the email couldn't be sent.
+            console.error("Booking confirmation email failed:", mailErr.message);
 
-            message: notification.message,
-
-            type: notification.type,
-
-            isRead: notification.isRead,
-
-            createdAt: notification.createdAt,
-
-            redirectUrl: notification.redirectUrl
-
-        });
+        }
 
         return res.status(201).json({
 
@@ -1131,6 +1122,37 @@ async function handleGetPatientNotifications(req, res) {
 
 }
 
+async function handlePatientNotificationsPage(req, res) {
+
+    try {
+
+        const notifications = await notificationModel
+            .find({
+                receiverId: req.user._id
+            })
+            .populate("senderId", "name profilePic")
+            .sort({
+                createdAt: -1
+            });
+
+        return res.status(200).render("doctor/doctorNotifications", {
+            user: req.user,
+            notifications,
+            activePage: "notifications"
+        });
+
+    }
+    catch (err) {
+
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+
+    }
+
+}
+
 async function handleMarkPatientNotificationRead(req, res) {
 
     try {
@@ -1168,6 +1190,7 @@ async function handleMarkPatientNotificationRead(req, res) {
             message: "Notification marked as read."
 
         });
+
 
     }
     catch (err) {
@@ -1404,7 +1427,7 @@ module.exports = {
     completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment
     , handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost,
     patientProfileGet, updatePatientProfileGet, handleGetPatientNotifications,
-    handleMarkPatientNotificationRead, reviewPage, submitReview, aiSymptomCheckerPage,
-    analyzeSymptoms
+    handleMarkPatientNotificationRead, handlePatientNotificationsPage, reviewPage, submitReview,
+    aiSymptomCheckerPage, analyzeSymptoms
 
 }

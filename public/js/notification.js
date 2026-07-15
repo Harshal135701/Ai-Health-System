@@ -44,7 +44,7 @@ function renderNotification(notification) {
         </div>
     `;
 
-    notificationList.prepend(notificationItem);
+    notificationList.appendChild(notificationItem);
 
 }
 

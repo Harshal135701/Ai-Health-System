@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const { completeProfile, updateProfile, dashboardPage, Alldoctors, completeDoctorInfo, bookAppointment, handleBookAppointment, allappointments, cancelAppointment, editAppointment, editAppointmentPost, patientProfileGet, updatePatientProfileGet,
-    handleGetPatientNotifications, handleMarkPatientNotificationRead, reviewPage, submitReview,
+    handleGetPatientNotifications, handleMarkPatientNotificationRead, handlePatientNotificationsPage, reviewPage, submitReview,
     aiSymptomCheckerPage, analyzeSymptoms
 } = require("../controllers/patientController")
 const { authMiddleware } = require("../middlewares/auth")
@@ -21,6 +21,7 @@ router.get("/:DoctorUserId/appointment/booking", authMiddleware, roleMiddleware(
 router.get("/appointments/:appointmentId/edit", authMiddleware, roleMiddleware("patient"), editAppointment)
 router.get("/appointments", authMiddleware, roleMiddleware("patient"), allappointments)
 router.get("/notifications", authMiddleware, roleMiddleware("patient"), handleGetPatientNotifications);
+router.get("/notifications/page", authMiddleware, roleMiddleware("patient"), handlePatientNotificationsPage);
 router.get("/review/:appointmentId", authMiddleware, roleMiddleware("patient"), reviewPage);
 router.get("/ai-symptom-checker", authMiddleware, roleMiddleware("patient"), aiSymptomCheckerPage)
 

@@ -2,6 +2,9 @@ const userModel = require("../models/user")
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
+const User = require("../models/user");
+const OTP = require("../models/otp");
+const { sendOTPEmail } = require("../services/mailService");
 
 async function registration(req, res) {
     try {
@@ -123,7 +126,7 @@ async function logout(req, res) {
     try {
         // 1. Clear the cookie
         res.clearCookie("token");
-        
+
         // 2. Send a response to the client to confirm success
         return res.redirect("/login")
     }
@@ -134,6 +137,204 @@ async function logout(req, res) {
     }
 }
 
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // 1. Check user exists
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        // 2. Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // 3. Delete old OTP if exists
+        await OTP.deleteOne({ email });
+
+        // 4. Set expiry time (5 minutes)
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+        // 5. Save new OTP
+        await OTP.create({
+            email,
+            otp,
+            expiresAt,
+            isVerified: false
+        });
+
+        // 6. Send OTP email
+        await sendOTPEmail(email, otp);
+
+        res.render("auth/verifyOTP", {
+            email
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+const verifyOTP = async (req, res) => {
+    try {
+
+        const { email, otp } = req.body;
+
+
+        if (!email || !otp) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and OTP are required"
+            });
+        }
+
+
+        // Find OTP record
+        const otpRecord = await OTP.findOne({ email });
+
+
+        if (!otpRecord) {
+            return res.status(400).json({
+                success: false,
+                message: "OTP not found or expired"
+            });
+        }
+
+
+        // Check expiry
+        if (otpRecord.expiresAt < new Date()) {
+
+            await OTP.deleteOne({ email });
+
+            return res.status(400).json({
+                success: false,
+                message: "OTP expired"
+            });
+        }
+
+
+        // Check OTP
+        if (otpRecord.otp !== otp) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid OTP"
+            });
+        }
+
+
+        // Mark OTP verified
+        otpRecord.isVerified = true;
+
+        await otpRecord.save();
+
+
+        return res.render("auth/resetPassword", {
+            email
+        });
+
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+};
+
+const resetPassword = async (req, res) => {
+
+    try {
+
+        const { email, newPassword } = req.body;
+
+
+        if (!email || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and new password are required"
+            });
+        }
+
+
+        // Password validation
+        // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+
+        // if (!passwordRegex.test(newPassword)) {
+
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Password must contain minimum 8 characters, one uppercase, one lowercase and one number"
+        //     });
+
+        // }
+
+
+        // Check OTP verification
+        const otpRecord = await OTP.findOne({ email });
+
+
+        if (!otpRecord || !otpRecord.isVerified) {
+
+            return res.status(400).json({
+                success: false,
+                message: "OTP verification required"
+            });
+
+        }
+
+        // Find user
+        const user = await User.findOne({ email });
+
+        if (!user) {
+
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password
+        user.password = hashedPassword;
+
+        await user.save();
+
+        // Delete OTP after successful reset
+        await OTP.deleteOne({ email });
+
+        res.redirect("/login");
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+
+async function forgotPass(req, res) {
+    res.render("auth/forgotPassword");
+}
+
 module.exports = {
-    registration, login, loginPage, registrationPage,logout
+    registration, login, loginPage, registrationPage, logout, forgotPassword, verifyOTP,
+    resetPassword, forgotPass
 }

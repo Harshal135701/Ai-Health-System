@@ -4,7 +4,11 @@ const app = express()
 
 const connectDb = require('./config/db')
 connectDb()
+const startAppointmentExpiryScheduler = require("./utils/appointmentExpiryScheduler");
+startAppointmentExpiryScheduler()
+
 const redisClient = require("./config/redis");
+
 
 const cookieParser = require('cookie-parser');
 const path = require('path');

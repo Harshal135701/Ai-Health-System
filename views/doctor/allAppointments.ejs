@@ -15,27 +15,27 @@
 
         <select name="status" onchange="this.form.submit()">
 
-            <option value="all" <%= selectedStatus==="all" ? "selected" : "" %>>
+            <option value="all" <%=selectedStatus==="all" ? "selected" : "" %>>
                 All Appointments
             </option>
 
-            <option value="today" <%= selectedStatus==="today" ? "selected" : "" %>>
+            <option value="today" <%=selectedStatus==="today" ? "selected" : "" %>>
                 Today's Appointments
             </option>
 
-            <option value="pending" <%= selectedStatus==="pending" ? "selected" : "" %>>
+            <option value="pending" <%=selectedStatus==="pending" ? "selected" : "" %>>
                 Pending Appointments
             </option>
 
-            <option value="confirmed" <%= selectedStatus==="confirmed" ? "selected" : "" %>>
+            <option value="confirmed" <%=selectedStatus==="confirmed" ? "selected" : "" %>>
                 Confirmed Appointments
             </option>
 
-            <option value="rejected" <%= selectedStatus==="rejected" ? "selected" : "" %>>
+            <option value="rejected" <%=selectedStatus==="rejected" ? "selected" : "" %>>
                 Rejected Appointments
             </option>
 
-            <option value="completed" <%= selectedStatus==="completed" ? "selected" : "" %>>
+            <option value="completed" <%=selectedStatus==="completed" ? "selected" : "" %>>
                 Completed Appointments
             </option>
 
@@ -43,121 +43,115 @@
 
     </form>
 
-    <% if (appointments.length === 0) { %>
+    <% if (appointments.length===0) { %>
 
         <h3>No appointments found.</h3>
 
-    <% } else { %>
+        <% } else { %>
 
-        <% appointments.forEach(function(appointment){ %>
+            <% appointments.forEach(function(appointment){ %>
 
-            <hr>
+                <hr>
 
-            <h3>Patient Details</h3>
+                <h3>Patient Details</h3>
 
-            <p>
-                <strong>Name:</strong>
-                <%= appointment.patientId.name %>
-            </p>
+                <p>
+                    <strong>Name:</strong>
+                    <%= appointment.patientId.name %>
+                </p>
 
-            <p>
-                <strong>Email:</strong>
-                <%= appointment.patientId.email %>
-            </p>
+                <p>
+                    <strong>Email:</strong>
+                    <%= appointment.patientId.email %>
+                </p>
 
-            <p>
-                <strong>Phone:</strong>
-                <%= appointment.patientId.phoneNo %>
-            </p>
+                <p>
+                    <strong>Phone:</strong>
+                    <%= appointment.patientId.phoneNo %>
+                </p>
 
-            <h3>Appointment Details</h3>
+                <h3>Appointment Details</h3>
 
-            <p>
-                <strong>Date:</strong>
-                <%= appointment.appointmentDate.toDateString() %>
-            </p>
+                <p>
+                    <strong>Date:</strong>
+                    <%= appointment.appointmentDate.toDateString() %>
+                </p>
 
-            <p>
-                <strong>Start Time:</strong>
-                <%= appointment.startTime %> minutes
-            </p>
+                <p>
+                    <strong>Start Time:</strong>
+                    <%= String(Math.floor(appointment.startTime / 60)).padStart(2, '0') %>:<%= String(appointment.startTime % 60).padStart(2, '0') %>
+                </p>
 
-            <p>
-                <strong>End Time:</strong>
-                <%= appointment.endTime %> minutes
-            </p>
+                <p>
+                    <strong>End Time:</strong>
+                   <%= String(Math.floor(appointment.endTime / 60)).padStart(2, '0') %>:<%= String(appointment.endTime % 60).padStart(2, '0') %> 
+                </p>
 
-            <p>
-                <strong>Status:</strong>
-                <%= appointment.appointmentStatus %>
-            </p>
+                <p>
+                    <strong>Status:</strong>
+                    <%= appointment.appointmentStatus %>
+                </p>
 
-            <p>
-                <strong>Symptoms:</strong>
-                <%= appointment.symptoms %>
-            </p>
+                <p>
+                    <strong>Symptoms:</strong>
+                    <%= appointment.symptoms %>
+                </p>
 
-            <p>
-                <strong>Patient Message:</strong>
-                <%= appointment.patientMessage %>
-            </p>
+                <p>
+                    <strong>Patient Message:</strong>
+                    <%= appointment.patientMessage %>
+                </p>
 
-            <p>
-                <strong>Consultation Fee:</strong>
-                ₹<%= appointment.consultationFee %>
-            </p>
+                <p>
+                    <strong>Consultation Fee:</strong>
+                    ₹<%= appointment.consultationFee %>
+                </p>
 
-            <!-- Change Status Form -->
-            <form class="statusChangeForm" data-appointment-id="<%= appointment._id %>">
+                <!-- Change Status Form -->
+                <form class="statusChangeForm" data-appointment-id="<%= appointment._id %>">
 
-                <select name="appointmentStatus">
+                    <select name="appointmentStatus">
 
-                    <option value="confirmed"
-                        <%= appointment.appointmentStatus==="confirmed" ? "selected" : "" %>>
-                        Confirmed
-                    </option>
+                        <option value="confirmed" <%=appointment.appointmentStatus==="confirmed" ? "selected" : "" %>>
+                            Confirmed
+                        </option>
 
-                    <option value="rejected"
-                        <%= appointment.appointmentStatus==="rejected" ? "selected" : "" %>>
-                        Rejected
-                    </option>
+                        <option value="rejected" <%=appointment.appointmentStatus==="rejected" ? "selected" : "" %>>
+                            Rejected
+                        </option>
 
-                    <option value="completed"
-                        <%= appointment.appointmentStatus==="completed" ? "selected" : "" %>>
-                        Completed
-                    </option>
+                        <option value="completed" <%=appointment.appointmentStatus==="completed" ? "selected" : "" %>>
+                            Completed
+                        </option>
 
-                </select>
-
-                <button type="submit">
-                    Change Status
-                </button>
-
-            </form>
-
-            <!-- Chat Form -->
-            <% if (["confirmed","completed"].includes(appointment.appointmentStatus)) { %>
-
-                <form action="/chat/start" method="POST" style="display:inline; margin-left:10px;">
-
-                    <input
-                        type="hidden"
-                        name="receiverId"
-                        value="<%= appointment.patientId._id %>">
+                    </select>
 
                     <button type="submit">
-                        💬 Open Chat
+                        Change Status
                     </button>
 
                 </form>
 
-            <% } %>
+                <!-- Chat Form -->
+                <% if (["confirmed","completed"].includes(appointment.appointmentStatus)) { %>
 
-        <% }) %>
+                    <form action="/chat/start" method="POST" style="display:inline; margin-left:10px;">
 
-    <% } %>
+                        <input type="hidden" name="receiverId" value="<%= appointment.patientId._id %>">
 
-    <script src="/js/changeStatus.js"></script>
+                        <button type="submit">
+                            💬 Open Chat
+                        </button>
+
+                    </form>
+
+                    <% } %>
+
+                        <% }) %>
+
+                            <% } %>
+
+                                <script src="/js/changeStatus.js"></script>
 
 </body>
 
