@@ -26,10 +26,6 @@ const patientRoute = require("./routes/patientRoute")
 const conversationRoute = require("./routes/conversationRoute");
 const chatRoute = require("./routes/chatRoute");
 
-app.get("/", (req, res) => {
-    res.send("Server Running");
-})
-
 app.use(cookieParser());
 app.use(express.json());
 app.set('view engine', 'ejs')

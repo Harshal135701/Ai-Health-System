@@ -6,6 +6,7 @@ const { registration, login, loginPage, registrationPage, logout,forgotPassword,
 const { authMiddleware } = require("../middlewares/auth")
 const { roleMiddleware } = require("../middlewares/roleMiddleware");
 
+router.get("/",registrationPage)
 router.get("/login", loginPage)
 router.get("/registration", registrationPage)
 router.get("/logout", authMiddleware, logout)
