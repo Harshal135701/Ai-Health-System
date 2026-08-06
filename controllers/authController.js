@@ -90,10 +90,22 @@ async function login(req, res) {
             httpOnly: true,
             // secure: true
         })
-        if (userExist.role === 'doctor') {
-            return res.redirect('/doctor/dashboard');
-        }
-        return res.redirect("/patient/dashboard");
+
+        const safeUser = {
+            _id: userExist._id,
+            name: userExist.name,
+            email: userExist.email,
+            phoneNo: userExist.phoneNo,
+            role: userExist.role,
+            profilePic: userExist.profilePic,
+            isProfileCompleted: userExist.isProfileCompleted
+        };
+
+        return res.status(200).json({
+            status: true,
+            message: "Logged in successfully",
+            user: safeUser
+        });
 
     }
     catch (err) {
@@ -128,7 +140,10 @@ async function logout(req, res) {
         res.clearCookie("token");
 
         // 2. Send a response to the client to confirm success
-        return res.redirect("/login")
+        return res.status(200).json({
+            status: true,
+            message: "Logged out successfully"
+        })
     }
     catch (err) {
         // 3. Handle errors
@@ -145,7 +160,7 @@ const forgotPassword = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).render("auth/forgotPassword", {
+            return res.status(404).json({
                 success: false,
                 message: "User not found"
             });
@@ -171,7 +186,9 @@ const forgotPassword = async (req, res) => {
         // 6. Send OTP email
         await sendOTPEmail(email, otp);
 
-        res.render("auth/verifyOTP", {
+        res.status(200).json({
+            success: true,
+            message: "OTP sent to your email",
             email
         });
 
@@ -237,7 +254,9 @@ const verifyOTP = async (req, res) => {
         await otpRecord.save();
 
 
-        return res.render("auth/resetPassword", {
+        return res.status(200).json({
+            success: true,
+            message: "OTP verified",
             email
         });
 
@@ -317,7 +336,10 @@ const resetPassword = async (req, res) => {
         // Delete OTP after successful reset
         await OTP.deleteOne({ email });
 
-        res.redirect("/login");
+        res.status(200).json({
+            success: true,
+            message: "Password reset successfully"
+        });
 
     } catch (error) {
 
@@ -334,7 +356,30 @@ async function forgotPass(req, res) {
     res.render("auth/forgotPassword");
 }
 
+async function getMe(req, res) {
+    try {
+        const user = req.user;
+        return res.status(200).json({
+            status: true,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phoneNo: user.phoneNo,
+                role: user.role,
+                profilePic: user.profilePic,
+                isProfileCompleted: user.isProfileCompleted
+            }
+        });
+    } catch (err) {
+        return res.status(500).json({
+            status: false,
+            message: err.message
+        });
+    }
+}
+
 module.exports = {
     registration, login, loginPage, registrationPage, logout, forgotPassword, verifyOTP,
-    resetPassword, forgotPass
+    resetPassword, forgotPass, getMe
 }

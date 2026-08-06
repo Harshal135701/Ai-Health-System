@@ -331,27 +331,16 @@ async function dashboardPage(req, res) {
 
         const recentAppointments = appointments.slice(0, 5);
 
-        return res.status(200).render("doctor/dashboard", {
+        return res.status(200).json({
             doctor,
-
             totalAppointments,
-
             todayCount: todayAppointments.length,
-
             pendingCount,
-
             confirmedCount,
-
             rejectedCount,
-
             todayAppointments,
-
             recentAppointments,
-
-            activePage: "dashboard",
-
             user: req.user,
-
             status: true
         });
 
@@ -385,7 +374,8 @@ async function getProfileForUpdate(req, res) {
         const profile = await doctorProfileModel.findOne({ userId: req.user._id });
 
         if (!profile) {
-            return res.status(404).render("error", {
+            return res.status(404).json({
+                status: false,
                 message: "Profile not found. Please complete your profile first."
             });
         }
@@ -397,17 +387,17 @@ async function getProfileForUpdate(req, res) {
             endTime: minutesToTime(slot.endTime)
         }));
 
-        return res.render("doctor/updateDoctorProfile", {
+        return res.status(200).json({
+            status: true,
             profile: {
                 specialization: profile.specialization || "",
                 experience: profile.experience || 0,
                 hospital: profile.hospital || "",
                 education: profile.education || "",
                 consultationFee: profile.consultationFee || 0,
-                availability,
-                activePage: "updateDoctorProfile",
-                user: req.user,
-            }
+                availability
+            },
+            user: req.user
         });
 
     } catch (err) {
@@ -476,11 +466,11 @@ async function allAppointments(req, res) {
                 startTime: 1
             });
 
-        return res.render("doctor/allAppointments", {
+        return res.status(200).json({
+            status: true,
             appointments,
             selectedStatus: status,
-            activePage: "appointments",
-            user: req.user,
+            user: req.user
         });
 
     }
@@ -764,17 +754,15 @@ async function handleNotificationPage(req, res) {
                 createdAt: -1
             });
 
-        return res.render(
-            "doctor/doctorNotifications",
-            {
-                user: req.user,
-                notifications
-            }
-        );
+        return res.status(200).json({
+            status: true,
+            user: req.user,
+            notifications
+        });
 
     } catch (err) {
 
-        return res.status(500).send(err.message);
+        return res.status(500).json({ status: false, message: err.message });
 
     }
 

@@ -25,7 +25,7 @@ const startChat = async (req, res) => {
         });
 
         if (!doctorProfile) {
-            return res.status(404).send("Doctor profile not found");
+            return res.status(404).json({ status: false, message: "Doctor profile not found" });
         }
 
         const appointment = await Appointment.findOne({
@@ -37,7 +37,7 @@ const startChat = async (req, res) => {
         });
 
         if (!appointment) {
-            return res.status(403).send("Chat not allowed.");
+            return res.status(403).json({ status: false, message: "Chat not allowed." });
         }
 
         let conversation = await Conversation.findOne({
@@ -54,11 +54,11 @@ const startChat = async (req, res) => {
 
         }
 
-        return res.redirect(`/chat/${conversation._id}`);
+        return res.status(200).json({ status: true, conversationId: conversation._id });
 
     } catch (err) {
         console.log(err);
-        return res.status(500).send("Internal Server Error");
+        return res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };
 
@@ -67,19 +67,20 @@ const openChat = async (req, res) => {
 
         const { conversationId } = req.params;
 
-        const conversation = await Conversation.findById(conversationId);
+        const conversation = await Conversation.findById(conversationId)
+            .populate("participants", "name role profilePic");
 
         if (!conversation) {
-            return res.status(404).send("Conversation not found");
+            return res.status(404).json({ status: false, message: "Conversation not found" });
         }
 
         // Security check
         const isParticipant = conversation.participants.some(
-            (id) => id.toString() === req.user._id.toString()
+            (p) => p._id.toString() === req.user._id.toString()
         );
 
         if (!isParticipant) {
-            return res.status(403).send("Unauthorized");
+            return res.status(403).json({ status: false, message: "Unauthorized" });
         }
 
         const messages = await Message.find({
@@ -88,7 +89,8 @@ const openChat = async (req, res) => {
             .populate("sender", "name role profilePic")
             .sort({ createdAt: 1 });
 
-        res.render("chat", {
+        return res.status(200).json({
+            status: true,
             user: req.user,
             conversation,
             messages
@@ -96,10 +98,10 @@ const openChat = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.status(500).send("Internal Server Error");
+        res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };
 
 module.exports = {
-    startChat,openChat
+    startChat, openChat
 };

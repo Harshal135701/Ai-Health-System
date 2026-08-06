@@ -284,25 +284,15 @@ async function dashboardPage(req, res) {
                 formattedEndTime: formatTime(appointment.endTime)
             }));
 
-        return res.status(200).render("patient/dashboard", {
+        return res.status(200).json({
             patient,
-
             totalAppointments,
-
             pendingCount,
-
             confirmedCount,
-
             rejectedCount,
-
             upcomingAppointment: formattedUpcomingAppointment,
-
             recentAppointments,
-
-            activePage: "dashboard",
-
             user: req.user,
-
             status: true,
             message: "Patient Dashboard"
         });
@@ -403,13 +393,14 @@ async function Alldoctors(req, res) {
             currentPage * limit
         );
 
-        return res.status(200).render("patient/Alldoctors", {
+        return res.status(200).json({
+            status: true,
             doctors: paginatedDoctors,
             filters: req.query,
-            activePage: "Alldoctors",
             user: req.user,
             currentPage,
-            totalPages
+            totalPages,
+            totalDoctors
         });
 
     } catch (err) {
@@ -433,7 +424,7 @@ async function completeDoctorInfo(req, res) {
             .populate("userId");
 
         if (!doctor) {
-            return res.status(404).redirect("/patient/Alldoctors");
+            return res.status(404).json({ status: false, message: "Doctor not found" });
         }
 
         // Fetch all reviews of this doctor
@@ -445,7 +436,8 @@ async function completeDoctorInfo(req, res) {
             .sort({ createdAt: -1 }).limit(5);
 
 
-        return res.status(200).render("patient/doctorProfile", {
+        return res.status(200).json({
+            status: true,
             doctor,
             reviews
         });
@@ -453,7 +445,7 @@ async function completeDoctorInfo(req, res) {
     }
     catch (err) {
 
-        return res.status(404).redirect("/patient/Alldoctors");
+        return res.status(404).json({ status: false, message: err.message });
 
     }
 }
@@ -466,15 +458,16 @@ async function bookAppointment(req, res) {
         }).populate("userId")
 
         if (!doctor) {
-            return res.status(404).redirect("/patient/Alldoctors");
+            return res.status(404).json({ status: false, message: "Doctor not found" });
         }
 
-        return res.status(200).render("patient/bookAppointment", {
+        return res.status(200).json({
+            status: true,
             doctor
         })
     }
     catch (err) {
-        return res.redirect("/patient/Alldoctors")
+        return res.status(500).json({ status: false, message: err.message });
     }
 }
 
@@ -486,7 +479,8 @@ async function handleBookAppointment(req, res) {
             startTime,
             endTime,
             symptoms,
-            patientMessage
+            patientMessage,
+            paymentMethod
         } = req.body;
 
         // Validate Required Fields
@@ -667,7 +661,9 @@ async function handleBookAppointment(req, res) {
 
                 patientMessage,
 
-                consultationFee: doctor.consultationFee
+                consultationFee: doctor.consultationFee,
+
+                paymentMethod: paymentMethod === "online" ? "online" : "hospital"
             });
 
         await sendNotification({
@@ -749,11 +745,10 @@ async function allappointments(req, res) {
             reviewMap[review.appointmentId.toString()] = review;
         });
 
-        return res.status(200).render("patient/appointments", {
+        return res.status(200).json({
             status: true,
             appointments: allappointments,
             reviewMap,
-            activePage: "appointments",
             user
         });
 
@@ -818,7 +813,20 @@ async function cancelAppointment(req, res) {
 async function editAppointment(req, res) {
     try {
         const appointmentId = req.params.appointmentId;
-        return res.status(200).render("patient/editAppointment", { appointmentId })
+        const appointment = await appointmentModel.findById(appointmentId).populate({
+            path: "doctorId",
+            populate: { path: "userId", select: "name email" }
+        });
+
+        if (!appointment) {
+            return res.status(404).json({ status: false, message: "Appointment not found." });
+        }
+
+        if (!appointment.patientId.equals(req.user._id)) {
+            return res.status(403).json({ status: false, message: "Not permitted." });
+        }
+
+        return res.status(200).json({ status: true, appointment })
     }
     catch (err) {
         return res.status(500).json({
@@ -1047,8 +1055,7 @@ async function editAppointmentPost(req, res) {
 
 async function patientProfileGet(req, res) {
     try {
-        return res.status(200).render("patient/profile", {
-            activePage: "profile",
+        return res.status(200).json({
             user: req.user,
             status: true,
             message: "user is logged in"
@@ -1072,8 +1079,8 @@ async function updatePatientProfileGet(req, res) {
                 message: "user profile is not created yet"
             })
         }
-        return res.status(200).render("patient/updateProfile", {
-            user,
+        return res.status(200).json({
+            profile: user,
             status: true,
             message: "user is logged in"
         })
@@ -1135,10 +1142,10 @@ async function handlePatientNotificationsPage(req, res) {
                 createdAt: -1
             });
 
-        return res.status(200).render("doctor/doctorNotifications", {
+        return res.status(200).json({
+            status: true,
             user: req.user,
-            notifications,
-            activePage: "notifications"
+            notifications
         });
 
     }
@@ -1225,12 +1232,12 @@ async function reviewPage(req, res) {
             });
 
         if (!appointment) {
-            return res.status(404).send("Appointment not found.");
+            return res.status(404).json({ status: false, message: "Appointment not found." });
         }
 
         // Security check
         if (appointment.patientId.toString() !== user._id.toString()) {
-            return res.status(403).send("Unauthorized.");
+            return res.status(403).json({ status: false, message: "Unauthorized." });
         }
 
         // Find existing review (if any)
@@ -1238,8 +1245,8 @@ async function reviewPage(req, res) {
             appointmentId
         });
 
-        return res.render("patient/review", {
-            user,
+        return res.status(200).json({
+            status: true,
             appointment,
             review
         });
@@ -1268,17 +1275,17 @@ async function submitReview(req, res) {
         const appointment = await appointmentModel.findById(appointmentId);
 
         if (!appointment) {
-            return res.status(404).send("Appointment not found.");
+            return res.status(404).json({ status: false, message: "Appointment not found." });
         }
 
         // Security check
         if (appointment.patientId.toString() !== user._id.toString()) {
-            return res.status(403).send("Unauthorized.");
+            return res.status(403).json({ status: false, message: "Unauthorized." });
         }
 
         // Appointment must be completed
         if (appointment.appointmentStatus !== "completed") {
-            return res.status(400).send("You can review only completed appointments.");
+            return res.status(400).json({ status: false, message: "You can review only completed appointments." });
         }
 
         // Prevent duplicate reviews
@@ -1287,7 +1294,7 @@ async function submitReview(req, res) {
         });
 
         if (existingReview) {
-            return res.status(400).send("You have already reviewed this appointment.");
+            return res.status(400).json({ status: false, message: "You have already reviewed this appointment." });
         }
 
         // Create review
@@ -1324,7 +1331,10 @@ async function submitReview(req, res) {
             }
         );
 
-        return res.redirect("/patient/appointments");
+        return res.status(201).json({
+            status: true,
+            message: "Review submitted successfully."
+        });
 
     }
     catch (err) {
@@ -1340,7 +1350,7 @@ async function submitReview(req, res) {
 
 async function aiSymptomCheckerPage(req, res) {
 
-    return res.render("patient/aiSymptomChecker");
+    return res.status(200).json({ status: true });
 
 }
 
