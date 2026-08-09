@@ -116,24 +116,6 @@ async function login(req, res) {
     }
 }
 
-async function loginPage(req, res) {
-    try {
-        return res.render("auth/login")
-    }
-    catch (err) {
-        return res.status(500).send("Something went wrong")
-    }
-}
-
-async function registrationPage(req, res) {
-    try {
-        return res.render("auth/registration")
-    }
-    catch (err) {
-        return res.status(500).send("Something went wrong")
-    }
-}
-
 async function logout(req, res) {
     try {
         // 1. Clear the cookie
@@ -352,10 +334,6 @@ const resetPassword = async (req, res) => {
 
 };
 
-async function forgotPass(req, res) {
-    res.render("auth/forgotPassword");
-}
-
 async function getMe(req, res) {
     try {
         const user = req.user;
@@ -380,6 +358,6 @@ async function getMe(req, res) {
 }
 
 module.exports = {
-    registration, login, loginPage, registrationPage, logout, forgotPassword, verifyOTP,
-    resetPassword, forgotPass, getMe
+    registration, login, logout, forgotPassword, verifyOTP,
+    resetPassword, getMe
 }
