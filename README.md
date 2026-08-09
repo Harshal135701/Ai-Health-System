@@ -198,6 +198,41 @@ Both patients and doctors can manage their profiles, including:
 
 ---
 
+# 📸 Screenshots
+
+## 🔐 Authentication
+
+![Login Page](screenShots/login.png)
+
+![Registration Page](screenShots/register.png)
+
+## 👤 Patient Dashboard
+
+![Patient Dashboard](screenShots/patientDashboard.png)
+
+## 👨‍⚕️ Doctor Dashboard
+
+![Doctor Dashboard](screenShots/doctorDashboard.png)
+
+## 🤖 AI Symptom Checker
+
+![AI Symptom Checker](screenShots/aiSymptomsChecker.png)
+
+## 📅 Appointment Booking
+
+![Appointment Booking](screenShots/doctorAppointmentBooking.png)
+
+## 💬 Doctor-Patient Chat
+
+![Chat](screenShots/chatBetweenDoctorPatient.png)
+
+## ⭐ Reviews & Ratings
+
+![Reviews](screenShots/doctorReviewProfile.png)
+
+
+---
+
 ## 🛠️ Technology Stack
 
 | Category | Technologies |
